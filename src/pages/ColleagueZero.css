@@ -1,0 +1,654 @@
+/* ── Colleague Zero (/colleague-zero) ─────────────────────────────────
+   Imported by ColleagueZeroPage.jsx, so Vite ships it inside that route's
+   chunk rather than the global render-blocking sheet. Every selector is
+   under .cz.
+
+   A marketing page, not a dashboard: editorial type, ruled lists, big
+   numerals and scroll-driven moments instead of card grids. The hero's
+   fine grid runs down the whole page on the site's --surface grey. Site
+   maroon (--maroon) is the only accent; ink type; navy footer like every
+   other page. Icons carry no fill or badge behind them. */
+
+.cz {
+  --cz-navy: var(--primary, #0a1733);
+  --cz-maroon: var(--maroon, #5e0743);
+  --cz-maroon-2: #7a1259;
+  --cz-mono: ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+  --cz-serif: "Canela", "Canela Fallback", serif;
+  --cz-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --cz-grid: rgba(10, 23, 51, 0.05);
+  color: var(--ink);
+  overflow-x: clip;
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(var(--cz-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--cz-grid) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.cz *,
+.cz *::before,
+.cz *::after { box-sizing: border-box; }
+
+/* Zero-specificity resets, so any class below can set its own margins. */
+:where(.cz) h1, :where(.cz) h2, :where(.cz) h3 { margin: 0; letter-spacing: -0.02em; }
+:where(.cz) p { margin: 0; }
+/* index.css spaces stacked sections 64px apart; here the grid is one
+   continuous canvas and each section sets its own padding. */
+.cz section + section { margin-top: 0; }
+
+.cz-sr {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+.cz-wrap { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 40px; }
+
+.cz-mono { font-family: var(--cz-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+.cz-eyebrow { display: flex; align-items: center; gap: 12px; color: var(--cz-maroon); font-weight: 700; }
+.cz-eyebrow span::after { content: ""; display: inline-block; width: 28px; height: 1.5px; margin-left: 12px; vertical-align: middle; background: currentColor; opacity: 0.5; }
+
+.cz-h2 {
+  margin-top: 20px;
+  font-size: clamp(38px, 5vw, 72px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.cz-lede { margin-top: 20px; font-size: 18px; line-height: 1.65; color: var(--text-2); max-width: 560px; }
+.cz-center { text-align: center; margin-left: auto; margin-right: auto; }
+.cz-note { margin-top: 28px; color: var(--text-3); }
+
+.cz-section { padding: 140px 0; position: relative; }
+.cz-section--tight { padding: 100px 0; }
+
+/* ── Buttons (match .btn-primary / .btn-secondary in index.css) ── */
+.cz-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 16px 28px;
+  border-radius: var(--rad-pill, 100px);
+  font-weight: 700; font-size: 16px; line-height: 1;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+.cz-btn:hover { transform: translateY(-1px); }
+.cz-btn:focus-visible { outline: 2px solid var(--cz-maroon); outline-offset: 3px; }
+.cz-btn--sm { padding: 12px 20px; font-size: 14px; }
+.cz-btn--primary { background: var(--primary); color: #fff; }
+.cz-btn--primary:hover { background: #4d4a73; box-shadow: 0 12px 24px -12px rgba(93, 90, 136, 0.5); }
+.cz-btn--secondary { color: var(--primary); border-color: var(--primary); background: transparent; }
+.cz-btn--secondary:hover { background: #fff; }
+.cz-btn--white { background: #fff; color: var(--cz-navy); }
+.cz-btn--white:hover { background: var(--surface-2); }
+.cz-btn--white:focus-visible { outline-color: #fff; }
+.cz-btn--maroon { background: var(--cz-maroon); color: #fff; }
+.cz-btn--maroon:hover { background: var(--cz-maroon-2); box-shadow: 0 14px 30px -14px rgba(94, 7, 67, 0.7); }
+.cz-btn--maroon:disabled { opacity: 0.7; cursor: progress; transform: none; }
+.cz-btn--block { width: 100%; }
+
+/* ── Header: the site's glass pill ── */
+.cz-header { position: fixed; inset: 0 0 auto 0; z-index: 50; padding: 16px 24px; pointer-events: none; }
+.cz-header-pill {
+  pointer-events: auto;
+  max-width: 1240px; margin: 0 auto;
+  display: flex; align-items: center; gap: 32px;
+  padding: 10px 12px 10px 28px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 8px 32px rgba(30, 40, 95, 0.09), 0 1.5px 0 rgba(255, 255, 255, 0.4) inset;
+  transition: box-shadow 0.35s ease, background 0.35s ease;
+}
+.cz-header.is-scrolled .cz-header-pill { background: rgba(255, 255, 255, 0.85); box-shadow: 0 12px 40px rgba(30, 40, 95, 0.14), 0 1.5px 0 rgba(255, 255, 255, 0.4) inset; }
+.cz-brand { display: inline-flex; align-items: center; gap: 14px; color: var(--ink); }
+.cz-brand img { height: 36px; width: auto; display: block; }
+.cz-brand-sep { width: 1px; height: 22px; background: var(--line-2); }
+.cz-brand-event { font-family: var(--cz-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cz-maroon); font-weight: 700; }
+.cz-header-nav { display: flex; gap: 28px; margin-left: auto; }
+.cz-header-nav a { color: var(--text-2); font-size: 14px; font-weight: 600; transition: color 0.2s ease; }
+.cz-header-nav a:hover { color: var(--ink); }
+
+/* ── Hero ── */
+.cz-hero,
+.cz-done { position: relative; padding: 140px 0 96px; overflow: hidden; isolation: isolate; }
+/* A white bloom and concentric rings behind the campus (HeroRings in the
+   page). The grid itself comes from .cz, so it runs unbroken down the page. */
+.cz-hero-bg {
+  position: absolute; inset: 0; z-index: -1; overflow: hidden;
+  background: radial-gradient(45% 50% at 72% 48%, #fff, transparent 70%);
+  -webkit-mask-image: radial-gradient(70% 80% at 72% 48%, #000 30%, transparent 75%);
+  mask-image: radial-gradient(70% 80% at 72% 48%, #000 30%, transparent 75%);
+}
+/* The rings stay put. A pulse of colour runs outward through them, one ring
+   after the next (delay by --k), first in maroon and then in navy, like a
+   heartbeat. Only stroke colour and width change: paint, never layout. */
+.cz-rings { position: absolute; left: 72%; top: 48%; width: 1600px; height: 1600px; transform: translate(-50%, -50%); }
+.cz-rings circle {
+  fill: none;
+  stroke: rgba(94, 7, 67, 0.07);
+  stroke-width: 1.2;
+  animation: czRingPulse 5.2s ease-in-out infinite;
+  animation-delay: calc(var(--k) * 0.11s);
+}
+@keyframes czRingPulse {
+  0%, 100% { stroke: rgba(94, 7, 67, 0.07); stroke-width: 1.2; }
+  10% { stroke: rgba(94, 7, 67, 0.55); stroke-width: 2.6; }
+  26% { stroke: rgba(94, 7, 67, 0.07); stroke-width: 1.2; }
+  50% { stroke: rgba(10, 23, 51, 0.07); stroke-width: 1.2; }
+  60% { stroke: rgba(10, 23, 51, 0.45); stroke-width: 2.6; }
+  76% { stroke: rgba(10, 23, 51, 0.07); stroke-width: 1.2; }
+}
+.cz-hero-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 32px; align-items: center; }
+.cz-kicker { display: inline-flex; align-items: center; gap: 10px; color: var(--cz-maroon); font-weight: 700; }
+.cz-live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--cz-maroon); animation: czPing 1.8s ease-out infinite; flex-shrink: 0; }
+@keyframes czPing { 0% { box-shadow: 0 0 0 0 rgba(94, 7, 67, 0.45); } 100% { box-shadow: 0 0 0 9px rgba(94, 7, 67, 0); } }
+.cz-hero h1,
+.cz-done h1 {
+  margin: 22px 0 0;
+  font-size: clamp(46px, 6.2vw, 96px);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.cz-h1-accent { color: var(--cz-maroon); }
+.cz-hero-lede { margin-top: 30px; max-width: 520px; font-size: 18px; line-height: 1.6; color: var(--text-2); }
+.cz-hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+.cz-hero-facts { display: flex; flex-wrap: wrap; margin: 44px 0 0; border-top: 1px solid var(--line-2); }
+.cz-hero-facts > div { padding: 16px 28px 0 0; margin-right: 28px; border-right: 1px solid var(--line-2); }
+.cz-hero-facts > div:last-child { border-right: 0; margin-right: 0; }
+.cz-hero-facts dt { font-family: var(--cz-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
+.cz-hero-facts dd { margin: 6px 0 0; font-weight: 700; font-size: 16px; color: var(--ink); }
+.cz-hero-facts dd i { font-style: normal; font-weight: 400; color: var(--text-3); }
+
+/* ── Campus (ColleagueZeroCampus.jsx): floats on the grid, no card ── */
+.cz-campus { position: relative; padding-top: 44px; }
+.cz-campus-svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 30px 40px rgba(10, 23, 51, 0.12)); }
+.cz-hud { position: absolute; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; z-index: 2; }
+.cz-hud--top { top: 0; }
+.cz-hud-chip { display: inline-flex; align-items: center; gap: 8px; font-family: var(--cz-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-2); font-weight: 700; }
+.cz-hud-state {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--cz-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 6px 12px; border-radius: 100px;
+  background: #fff; border: 1px solid var(--line);
+  color: var(--ink); font-weight: 700;
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+.cz-hud-tool { color: var(--cz-maroon); text-transform: none; letter-spacing: 0; font-weight: 500; }
+.cz-state--escalate { background: var(--cz-maroon); border-color: var(--cz-maroon); color: #fff; animation: czBlink 0.9s steps(2) infinite; }
+.cz-state--escalate .cz-hud-tool { color: rgba(255, 255, 255, 0.75); }
+.cz-state--done { border-color: var(--cz-maroon); color: var(--cz-maroon); }
+@keyframes czBlink { 50% { opacity: 0.75; } }
+
+.cz-thought {
+  position: absolute; left: 50%; top: 56px; transform: translateX(-50%);
+  max-width: min(340px, 80%);
+  padding: 10px 14px; border-radius: 14px;
+  background: var(--cz-navy); color: #fff;
+  font-size: 13px; line-height: 1.45;
+  box-shadow: var(--shadow-lifted);
+  animation: czFadeUp 0.4s var(--cz-ease) both;
+  z-index: 3;
+}
+.cz-thought-k { display: block; font-family: var(--cz-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 255, 255, 0.6); margin-bottom: 3px; }
+@keyframes czFadeUp { from { opacity: 0; transform: translate(-50%, 6px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+.cz-slab-l { fill: #ccd2df; }
+.cz-slab-r { fill: #dfe3ec; }
+.cz-grid line { stroke: rgba(10, 23, 51, 0.07); stroke-width: 1; }
+.cz-box .cz-face-t { fill: #fff; }
+.cz-box .cz-face-r { fill: #e5e8f0; }
+.cz-box .cz-face-l { fill: #ccd2df; }
+.cz-box polygon { stroke: rgba(10, 23, 51, 0.16); stroke-width: 0.8; stroke-linejoin: round; transition: fill 0.45s ease; }
+.cz-box--roof .cz-face-t { fill: #f7f8fb; }
+.cz-box--tower .cz-face-t { fill: #fff; }
+.cz-window { fill: rgba(10, 23, 51, 0.18); transition: fill 0.45s ease; }
+.cz-label {
+  font-family: var(--cz-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  fill: var(--text-3);
+  /* A white halo keeps a label legible where it crosses a building. */
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
+  transition: fill 0.3s ease;
+}
+.cz-building.is-active .cz-face-t { fill: var(--cz-maroon-2); }
+.cz-building.is-active .cz-face-r { fill: #5e0743; }
+.cz-building.is-active .cz-face-l { fill: #45052f; }
+.cz-building.is-active .cz-window { fill: rgba(255, 255, 255, 0.75); }
+.cz-building.is-active .cz-label { fill: var(--cz-maroon); }
+.cz-tree-l { fill: #b7bfd3; }
+.cz-tree-r { fill: #d5dae6; }
+.cz-trail { stroke: var(--cz-maroon); stroke-width: 2; stroke-linecap: round; fill: none; animation: czTrailFade 10s linear forwards; }
+.cz-trail.is-still { animation: none; opacity: 0.45; }
+@keyframes czTrailFade { 0% { opacity: 0.75; } 100% { opacity: 0; } }
+.cz-trail-live { stroke: var(--cz-maroon); stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 2 5; opacity: 0.95; }
+.cz-agent-shadow { fill: rgba(10, 23, 51, 0.2); }
+.cz-agent-core { fill: var(--cz-maroon); stroke: #fff; stroke-width: 2; }
+.cz-agent-pulse { fill: none; stroke: var(--cz-maroon); stroke-width: 1.5; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.cz-agent-ring { fill: none; stroke: var(--cz-maroon); stroke-width: 2.4; stroke-linecap: round; opacity: 0; transition: opacity 0.2s ease; }
+.cz-beacon { opacity: 0; transition: opacity 0.3s ease; }
+.cz-campus.is-think .cz-agent-pulse { animation: czPulse 1.1s ease-out infinite; }
+.cz-campus.is-work .cz-agent-ring { opacity: 1; }
+.cz-campus.is-escalate .cz-beacon { opacity: 1; animation: czBeacon 0.9s ease-in-out infinite; }
+@keyframes czPulse { 0% { opacity: 0.9; transform: scale(0.7); } 100% { opacity: 0; transform: scale(2.2); } }
+@keyframes czBeacon { 50% { opacity: 0.35; } }
+.cz-student circle, .cz-student rect { fill: var(--text-3); }
+.cz-student.is-front circle, .cz-student.is-front rect { fill: var(--ink); }
+.cz-student.is-front { animation: czCheer 0.9s var(--cz-ease); transform-box: fill-box; transform-origin: bottom center; }
+@keyframes czCheer { 0% { transform: translateY(0); } 30% { transform: translateY(-9px) scale(1.08); } 55% { transform: translateY(0); } 75% { transform: translateY(-4px); } 100% { transform: translateY(0); } }
+.cz-flight rect { fill: var(--cz-maroon); }
+.cz-flight { animation: czFly 0.9s var(--cz-ease) forwards; }
+@keyframes czFly { 0% { transform: translate(0, 0); opacity: 1; } 45% { transform: translate(calc(var(--fx) * 0.5), calc(var(--fy) * 0.5 - 40px)); } 100% { transform: translate(var(--fx), var(--fy)); opacity: 0; } }
+
+/* ── Ticker ── */
+.cz-ticker {
+  background: var(--cz-maroon); color: #fff;
+  overflow: hidden; padding: 14px 0;
+  font-family: var(--cz-mono); font-size: 13px; font-weight: 600; letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.cz-ticker-track { display: inline-flex; animation: czTicker 38s linear infinite; }
+.cz-ticker-track span { padding-right: 24px; }
+.cz-ticker b { color: rgba(255, 255, 255, 0.4); padding: 0 12px; }
+@keyframes czTicker { to { transform: translateX(-50%); } }
+
+/* ── 01 Manifesto: words light up as you scroll ── */
+.cz-manifesto { padding: 140px 0 110px; }
+.cz-manifesto-text {
+  margin-top: 36px;
+  font-family: var(--cz-serif); font-weight: 700;
+  font-size: clamp(44px, 7.4vw, 120px);
+  line-height: 1; letter-spacing: -0.04em;
+  color: var(--ink);
+  max-width: 1120px;
+}
+.cz-manifesto-text [aria-hidden] > span {
+  opacity: clamp(0.14, calc(var(--p, 1) * (var(--n) + 6) - var(--i)), 1);
+  transition: opacity 0.25s linear;
+}
+.cz-manifesto-text .is-accent { color: var(--cz-maroon); }
+
+.cz-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 80px 0 0; border-top: 1px solid var(--line-2); }
+.cz-stats > div { padding: 20px 24px 0; border-left: 1px solid var(--line-2); }
+.cz-stats > div:first-child { border-left: 0; padding-left: 0; }
+.cz-stats dt { font-family: var(--cz-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); font-weight: 700; }
+.cz-stats dd { margin: 8px 0 0; font-family: var(--cz-serif); font-weight: 700; font-size: clamp(72px, 10vw, 156px); line-height: 0.9; letter-spacing: -0.04em; color: var(--ink); }
+.cz-stats > div:nth-child(2) dd { color: var(--cz-maroon); }
+
+/* ── Split layout: sticky heading beside a ruled list ── */
+.cz-split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; align-items: start; }
+
+/* 02 · The Main, as a compact building index: one line per building, so
+   the whole section fits in a single window. */
+.cz-places { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line-2); }
+.cz-places li {
+  display: grid; grid-template-columns: 40px minmax(0, 0.9fr) minmax(0, 1fr);
+  gap: 16px; align-items: baseline;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line-2);
+}
+.cz-places-n { color: var(--text-3); font-weight: 700; }
+.cz-places-name {
+  font-family: var(--cz-serif); font-weight: 700;
+  font-size: clamp(22px, 2.2vw, 30px); line-height: 1.1; letter-spacing: -0.02em;
+  color: var(--ink); white-space: nowrap;
+  transition: color 0.25s ease, transform 0.35s var(--cz-ease);
+}
+.cz-places-tease { color: var(--text-2); font-size: 15px; line-height: 1.45; }
+.cz-places li:hover .cz-places-name { color: var(--cz-maroon); transform: translateX(6px); }
+.cz-places li:hover .cz-places-n { color: var(--cz-maroon); }
+
+/* 03 · The hidden tests, as a redacted dossier */
+/* Shared: heading beside its lede (used by The show). */
+.cz-measured-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: end; }
+.cz-measured-head .cz-lede { margin: 0 0 8px; }
+
+.cz-dossier { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
+.cz-dossier li {
+  display: grid; grid-template-columns: 36px minmax(0, 1fr);
+  gap: 16px; align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line-2);
+}
+.cz-dossier-n { color: var(--text-3); font-weight: 700; }
+.cz-dossier-line { font-size: 18px; line-height: 1.45; font-weight: 500; color: var(--ink); }
+.cz-dossier-stamp {
+  display: inline-block; margin-top: 32px;
+  color: var(--cz-maroon); font-weight: 700; font-size: 12px; letter-spacing: 0.24em;
+  border: 2px solid currentColor; border-radius: 4px; padding: 6px 12px;
+  transform: rotate(-6deg);
+}
+.cz-redact {
+  position: relative; display: inline-block;
+  background: var(--ink); border-radius: 3px;
+  padding: 0 6px; margin: 0 2px;
+  line-height: 1.15; vertical-align: baseline;
+  cursor: not-allowed;
+}
+.cz-redact-text { color: transparent; user-select: none; }
+.cz-redact-tip {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; white-space: nowrap;
+  opacity: 0; transition: opacity 0.2s ease;
+}
+.cz-redact:hover .cz-redact-tip,
+.cz-redact:active .cz-redact-tip { opacity: 1; }
+.cz-redact:hover { animation: czNope 0.35s ease; background: var(--cz-maroon); }
+@keyframes czNope { 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-2px); } 80% { transform: translateX(2px); } }
+
+/* 04 · Lifelines: pinned while five lamps go out with the scroll */
+.cz-lifelines-sec { position: relative; height: 260vh; }
+/* Pinned by the data-pin attribute ColleagueZeroPage.jsx sets, not by
+   position: sticky (which can't engage under this site's html/body). */
+.cz-lifelines-pin { position: absolute; top: 0; left: 0; right: 0; height: 100vh; display: flex; align-items: center; }
+.cz-lifelines-sec[data-pin="on"] .cz-lifelines-pin { position: fixed; }
+.cz-lifelines-sec[data-pin="after"] .cz-lifelines-pin { top: auto; bottom: 0; }
+.cz-lifelines-pin .cz-eyebrow { justify-content: center; }
+.cz-lifelines-pin .cz-h2 { max-width: 900px; }
+.cz-lamps { display: flex; justify-content: center; gap: clamp(12px, 3vw, 40px); margin-top: 56px; }
+.cz-lamps span {
+  --off: clamp(0, calc((var(--p, 0) * 6 - (5 - var(--i)) - 0.33) * 4), 1);
+  position: relative;
+  width: clamp(52px, 11vw, 140px); aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px dashed var(--line-2);
+}
+.cz-lamps i {
+  position: absolute; inset: -2px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--cz-maroon-2), var(--cz-maroon) 60%);
+  box-shadow: 0 0 0 calc(10px * (1 - var(--off))) rgba(94, 7, 67, 0.1), 0 24px 40px -16px rgba(94, 7, 67, 0.6);
+  opacity: calc(1 - var(--off));
+  transform: scale(calc(1 - var(--off) * 0.2));
+}
+.cz-lamps-count { margin-top: 28px; text-align: center; color: var(--cz-maroon); font-size: 14px; font-weight: 700; letter-spacing: 0.2em; }
+
+/* 06 · The twist: one big rotating sentence */
+.cz-twist-line {
+  margin-top: 32px;
+  font-size: clamp(38px, 5.4vw, 84px); line-height: 1.04; letter-spacing: -0.035em;
+  color: var(--ink);
+}
+.cz-rotator { display: grid; margin-top: 4px; }
+.cz-rotator > span[aria-hidden] {
+  grid-area: 1 / 1;
+  color: var(--cz-maroon);
+  opacity: 0; transform: translateY(40%);
+  transition: opacity 0.5s var(--cz-ease), transform 0.6s var(--cz-ease);
+}
+.cz-rotator > span.is-on { opacity: 1; transform: none; }
+.cz-rotator > span.is-out { opacity: 0; transform: translateY(-40%); }
+
+/* 07 · The show: a broadcast frame, not a card */
+.cz-screen { position: relative; margin: 72px 0 0; padding: 64px 28px 28px; }
+.cz-screen-c { position: absolute; width: 34px; height: 34px; border: 2px solid var(--cz-maroon); }
+.cz-screen-c.tl { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+.cz-screen-c.tr { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+.cz-screen-c.bl { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+.cz-screen-c.br { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+.cz-screen-top { position: absolute; top: 22px; left: 28px; right: 28px; display: flex; justify-content: space-between; color: var(--text-2); font-weight: 700; font-size: 11px; }
+.cz-screen-top span { display: inline-flex; align-items: center; gap: 8px; }
+.cz-screen svg { display: block; width: 100%; height: auto; }
+.cz-map-b { fill: #fff; stroke: var(--line-2); stroke-width: 1.5; }
+.cz-map-t { font-family: var(--cz-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; fill: var(--text-3); }
+.cz-ghost-trail { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: czGhostTrail var(--dur) linear infinite; }
+.cz-ghost-dot { stroke: #fff; stroke-width: 2.5; }
+@keyframes czGhostTrail { 0% { stroke-dashoffset: 1; opacity: 0.9; } 85% { stroke-dashoffset: 0; opacity: 0.9; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+.g1 .cz-ghost-trail { stroke: var(--cz-maroon); } .g1 .cz-ghost-dot { fill: var(--cz-maroon); }
+.g2 .cz-ghost-trail { stroke: var(--cz-navy); } .g2 .cz-ghost-dot { fill: var(--cz-navy); }
+.g3 { opacity: 0.55; }
+.g3 .cz-ghost-trail { stroke: var(--cz-maroon); stroke-width: 2; } .g3 .cz-ghost-dot { fill: var(--cz-maroon); }
+.g4 { opacity: 0.4; }
+.g4 .cz-ghost-trail { stroke: var(--cz-navy); } .g4 .cz-ghost-dot { fill: var(--cz-navy); }
+.cz-screen-board {
+  position: absolute; right: 44px; bottom: 44px;
+  list-style: none; margin: 0; padding: 12px 14px;
+  min-width: 210px;
+  background: rgba(255, 255, 255, 0.92); border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 11px; color: var(--ink);
+}
+.cz-screen-board li { display: flex; gap: 10px; padding: 4px 0; }
+.cz-screen-board b { color: var(--cz-maroon); width: 12px; }
+.cz-screen-board em { margin-left: auto; font-style: normal; font-weight: 700; }
+.cz-cams { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.cz-cams li { padding-top: 18px; border-top: 1px solid var(--line-2); color: var(--text-2); font-size: 16px; line-height: 1.55; }
+.cz-cams b { color: var(--ink); }
+
+/* 08 · House rules */
+.cz-rules { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line-2); }
+.cz-rules li { padding: 32px 28px 0 0; }
+.cz-rules li + li { padding-left: 28px; border-left: 1px solid var(--line-2); }
+.cz-rule-n { display: block; font-family: var(--cz-serif); font-weight: 700; font-size: 80px; line-height: 0.85; color: transparent; -webkit-text-stroke: 1.5px var(--cz-maroon); }
+.cz-rules h3 { margin-top: 24px; font-size: 24px; color: var(--ink); }
+.cz-rules p { margin-top: 10px; color: var(--text-2); font-size: 15.5px; line-height: 1.6; }
+
+/* 09 · Leo */
+.cz-leo-inner { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 72px; align-items: center; }
+.cz-leo-badge { width: 220px; height: 220px; border-radius: 50%; display: grid; place-items: center; border: 2px solid var(--cz-maroon); position: relative; }
+.cz-leo-badge::before { content: ""; position: absolute; inset: -16px; border-radius: 50%; border: 1.5px dashed rgba(94, 7, 67, 0.35); animation: czSpin 30s linear infinite; }
+.cz-leo-badge span { font-family: var(--cz-serif); font-weight: 700; font-size: 72px; color: var(--cz-maroon); letter-spacing: -0.03em; }
+@keyframes czSpin { to { transform: rotate(360deg); } }
+
+/* 10 · Register */
+.cz-register { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; align-items: start; }
+.cz-vacancy-title { margin-top: 20px; font-size: clamp(56px, 7vw, 108px); line-height: 0.95; letter-spacing: -0.04em; color: var(--ink); }
+.cz-vacancy dl { margin: 40px 0 0; border-top: 1px solid var(--line-2); }
+.cz-vacancy dl > div { display: flex; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line-2); }
+.cz-vacancy dt { font-family: var(--cz-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); padding-top: 3px; }
+.cz-vacancy dd { margin: 0; font-weight: 600; font-size: 15px; text-align: right; color: var(--ink); }
+
+.cz-form { background: #fff; border: 1px solid var(--line); border-radius: 28px; padding: 44px; box-shadow: var(--shadow-lifted); }
+.cz-form h3 { font-size: 34px; color: var(--ink); }
+.cz-form-sub { margin-top: 8px; color: var(--text-2); font-size: 15px; }
+.cz-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 28px 0 18px; }
+.cz-field { display: flex; flex-direction: column; gap: 7px; min-width: 0; border: 0; padding: 0; margin: 0; }
+.cz-field label, .cz-field legend { font-size: 13px; font-weight: 600; color: var(--ink-2); padding: 0; }
+.cz-field legend span { font-weight: 400; color: var(--text-3); }
+.cz-field input {
+  font-family: inherit; font-size: 15px; padding: 14px 16px;
+  border: 1.5px solid var(--line); border-radius: 12px;
+  background: #fff; color: var(--ink); width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.cz-field input:focus { outline: none; border-color: var(--cz-maroon); box-shadow: 0 0 0 4px rgba(94, 7, 67, 0.12); }
+.cz-field.has-error input { border-color: var(--cz-maroon); }
+.cz-field-err { font-size: 12.5px; font-weight: 600; color: var(--cz-maroon); }
+.cz-size legend { margin-bottom: 7px; }
+.cz-size-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.cz-size-opt {
+  position: relative; display: grid; place-items: center; height: 50px;
+  border: 1.5px solid var(--line); border-radius: 12px;
+  font-weight: 700; font-size: 16px; color: var(--ink-2); cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.cz-size-opt input { position: absolute; opacity: 0; inset: 0; cursor: pointer; margin: 0; }
+.cz-size-opt:hover { border-color: var(--line-2); }
+.cz-size-opt:has(input:focus-visible) { box-shadow: 0 0 0 4px rgba(94, 7, 67, 0.15); border-color: var(--cz-maroon); }
+.cz-size-opt.is-on { background: var(--cz-maroon); border-color: var(--cz-maroon); color: #fff; }
+.cz-size.has-error .cz-size-opt { border-color: rgba(94, 7, 67, 0.5); }
+.cz-stack { margin-top: 18px; }
+.cz-stack legend { margin-bottom: 10px; }
+.cz-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.cz-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: inherit; font-size: 14px; font-weight: 600;
+  padding: 9px 14px; border-radius: 100px;
+  border: 1.5px solid var(--line); background: #fff; color: var(--ink-2);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.cz-chip:hover { border-color: var(--line-2); }
+.cz-chip:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(94, 7, 67, 0.15); border-color: var(--cz-maroon); }
+.cz-chip.is-on { background: var(--cz-maroon); border-color: var(--cz-maroon); color: #fff; }
+.cz-form-error { margin-top: 20px; background: var(--surface); border: 1px solid var(--cz-maroon); color: var(--cz-maroon); padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.45; }
+.cz-form .cz-btn--block { margin-top: 28px; }
+.cz-form-fine { margin-top: 14px; font-size: 12.5px; line-height: 1.5; color: var(--text-3); text-align: center; }
+.cz-form-fine a { color: var(--cz-maroon); text-decoration: underline; }
+
+/* 11 · FAQ */
+.cz-faq { border-top: 1px solid var(--line-2); }
+.cz-faq details { border-bottom: 1px solid var(--line-2); }
+.cz-faq summary {
+  list-style: none; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center; gap: 24px;
+  padding: 26px 0;
+  font-size: 20px; font-weight: 600; color: var(--ink);
+  transition: color 0.2s ease;
+}
+.cz-faq summary::-webkit-details-marker { display: none; }
+.cz-faq summary:hover { color: var(--cz-maroon); }
+.cz-faq summary:focus-visible { outline: 2px solid var(--cz-maroon); outline-offset: 4px; border-radius: 4px; }
+.cz-faq-icon { position: relative; width: 16px; height: 16px; flex-shrink: 0; transition: transform 0.3s var(--cz-ease); }
+.cz-faq-icon::before, .cz-faq-icon::after { content: ""; position: absolute; left: 0; right: 0; top: 7px; height: 2px; background: currentColor; }
+.cz-faq-icon::after { transform: rotate(90deg); }
+.cz-faq details[open] .cz-faq-icon { transform: rotate(45deg); color: var(--cz-maroon); }
+.cz-faq details p { padding: 0 48px 28px 0; color: var(--text-2); font-size: 17px; line-height: 1.65; max-width: 640px; }
+
+/* Closer + footer (navy, like the site footer) */
+/* A slim sign-off strip, not a second hero. */
+.cz-closer { background: var(--cz-maroon); color: #fff; padding: 32px 0; }
+.cz-closer .cz-wrap { display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+.cz-closer p { font-family: var(--cz-serif); font-weight: 700; font-size: clamp(22px, 2.2vw, 30px); line-height: 1.15; letter-spacing: -0.02em; }
+.cz-closer .cz-btn { flex-shrink: 0; }
+.cz-footer { background: var(--ink); color: rgba(255, 255, 255, 0.6); padding: 48px 0; font-size: 14px; line-height: 1.7; }
+.cz-footer-inner { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; flex-wrap: wrap; }
+.cz-footer img { width: 104px; height: auto; display: block; margin-bottom: 16px; }
+/* index.css sizes every footer logo to width: auto !important on mobile,
+   which blows this one up to its natural 1943px-wide scale. */
+.cz .cz-footer img { width: 104px !important; height: auto !important; }
+.cz-footer a { color: #fff; }
+.cz-footer a:hover { color: rgba(255, 255, 255, 0.7); }
+.cz-footer-meta { display: flex; flex-wrap: wrap; gap: 24px; align-items: center; }
+.cz-footer-meta .cz-mono { color: rgba(255, 255, 255, 0.4); }
+
+/* ── /colleague-zero/registered ── */
+.cz-done-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 56px; align-items: center; }
+.cz-badge-card {
+  position: relative; border-radius: 28px; padding: 32px;
+  background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow-lifted);
+  transform: rotate(2deg);
+  animation: czBadgeIn 0.8s var(--cz-ease) both;
+}
+@keyframes czBadgeIn { from { opacity: 0; transform: rotate(8deg) translateY(30px); } to { opacity: 1; transform: rotate(2deg); } }
+.cz-badge-card::before { content: ""; position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 64px; height: 12px; border-radius: 6px; background: var(--cz-maroon); box-shadow: 0 0 0 4px var(--surface); }
+.cz-badge-top { display: flex; justify-content: space-between; align-items: center; color: var(--cz-maroon); font-weight: 700; }
+.cz-badge-top img { height: 34px; width: auto; }
+.cz-badge-id { margin-top: 28px; font-size: clamp(36px, 4vw, 52px); letter-spacing: 0.04em; color: var(--ink); text-transform: none; }
+.cz-badge-card dl { margin: 24px 0 0; }
+.cz-badge-card dl > div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid var(--line); }
+.cz-badge-card dt { font-family: var(--cz-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
+.cz-badge-card dd { margin: 0; font-weight: 600; text-align: right; color: var(--ink); }
+.cz-verdict { display: inline-block; padding: 4px 10px; border-radius: 100px; font-size: 12px; font-weight: 700; }
+.cz-verdict.is-pending { background: var(--surface-2); color: var(--cz-maroon); }
+.cz-badge-lives { display: flex; align-items: center; gap: 6px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
+.cz-badge-lives span { width: 14px; height: 14px; border-radius: 50%; background: var(--cz-maroon); }
+.cz-badge-lives em { font-style: normal; margin-left: 8px; color: var(--text-3); font-size: 11px; }
+.cz-timeline { list-style: none; padding: 0; margin: 56px 0 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); position: relative; }
+.cz-timeline::before { content: ""; position: absolute; left: 0; right: 0; top: 19px; height: 2px; background: repeating-linear-gradient(90deg, var(--line-2) 0 8px, transparent 8px 14px); }
+.cz-timeline li { position: relative; padding-right: 24px; }
+/* No badge: the number or tick sits on the line. The page colour behind it
+   only breaks the dashed line so the glyph stays legible. */
+.cz-timeline-dot { position: relative; z-index: 1; display: grid; place-items: center; width: 40px; height: 40px; font-family: var(--cz-mono); font-size: 13px; font-weight: 700; color: var(--text-3); background: var(--surface); }
+.cz-timeline li.is-done .cz-timeline-dot { color: var(--cz-maroon); }
+.cz-timeline h3 { margin-top: 22px; font-size: 21px; color: var(--ink); }
+.cz-timeline p { margin-top: 8px; color: var(--text-2); font-size: 14.5px; line-height: 1.55; }
+
+/* index.css forces every h2 to 26–32px and every h3 to 20–22px on mobile,
+   with !important. These headings are sized on purpose, so they reassert:
+   a class beats the bare element selector when both are !important. */
+.cz .cz-h2 { font-size: clamp(34px, 5vw, 72px) !important; line-height: 1.02 !important; }
+.cz .cz-twist-line { font-size: clamp(34px, 5.4vw, 84px) !important; line-height: 1.04 !important; }
+.cz .cz-vacancy-title { font-size: clamp(52px, 7vw, 108px) !important; line-height: 0.95 !important; }
+.cz .cz-form h3 { font-size: clamp(26px, 3vw, 34px) !important; }
+.cz .cz-rules h3 { font-size: 24px !important; }
+.cz .cz-timeline h3 { font-size: 21px !important; }
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .cz-header-nav { display: none; }
+  .cz-header-pill > .cz-btn { margin-left: auto; }
+  .cz-hero-grid, .cz-done-grid { grid-template-columns: 1fr; gap: 48px; }
+  .cz-hero-lede { max-width: 640px; }
+  .cz-split, .cz-register { grid-template-columns: 1fr; gap: 48px; }
+  .cz-rules { grid-template-columns: 1fr 1fr; }
+  .cz-rules li:nth-child(3) { padding-left: 0; border-left: 0; }
+  .cz-rules li:nth-child(n + 3) { padding-top: 40px; }
+  .cz-badge-card { max-width: 460px; }
+}
+
+@media (max-width: 860px) {
+  .cz-wrap { padding: 0 24px; }
+  .cz-header { padding: 12px 16px; }
+  .cz-header-pill { padding: 8px 8px 8px 20px; gap: 16px; }
+  .cz-section { padding: 96px 0; }
+  .cz-manifesto { padding: 104px 0 88px; }
+  .cz-stats { grid-template-columns: 1fr 1fr; margin-top: 64px; }
+  .cz-stats > div:nth-child(3) { border-left: 0; padding-left: 0; }
+  .cz-stats > div:nth-child(n + 3) { padding-top: 28px; }
+  .cz-measured-head { grid-template-columns: 1fr; gap: 0; }
+  .cz-measured-head .cz-lede { margin-top: 20px; }
+  .cz-section--tight { padding: 52px 0; }
+  .cz-dossier li { padding: 10px 0; }
+  .cz-dossier-stamp { margin-top: 20px; }
+  .cz-places li { grid-template-columns: 32px minmax(0, 1fr); row-gap: 2px; padding: 9px 0; }
+  .cz-places-tease { grid-column: 2; font-size: 14px; }
+  .cz-dossier-line { font-size: 16px; }
+  .cz-rings { left: 50%; top: 72%; }
+  .cz-screen { padding: 56px 12px 12px; }
+  .cz-screen-board { position: static; margin-top: 16px; }
+  .cz-cams { grid-template-columns: 1fr; gap: 0; }
+  .cz-cams li { padding: 16px 0; }
+  .cz-leo-inner { grid-template-columns: 1fr; gap: 40px; justify-items: start; }
+  .cz-leo-badge { width: 140px; height: 140px; margin-left: 16px; }
+  .cz-leo-badge span { font-size: 46px; }
+  .cz-closer .cz-wrap { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .cz-timeline { grid-template-columns: 1fr; gap: 28px; }
+  .cz-timeline::before { left: 19px; right: auto; top: 0; bottom: 0; width: 2px; height: auto; background: repeating-linear-gradient(180deg, var(--line-2) 0 8px, transparent 8px 14px); }
+  .cz-timeline li { display: grid; grid-template-columns: 40px 1fr; column-gap: 18px; padding: 0; }
+  .cz-timeline-dot { grid-row: span 2; }
+  .cz-timeline h3 { margin-top: 8px; }
+}
+
+@media (max-width: 600px) {
+  .cz-wrap { padding: 0 16px; }
+  .cz-header { padding: 10px 12px; }
+  .cz-brand img { height: 30px; }
+  .cz-brand-sep, .cz-brand-event { display: none; }
+  .cz-hero, .cz-done { padding-top: 112px; padding-bottom: 72px; }
+  .cz-hero-lede { font-size: 16.5px; }
+  .cz-hero-cta .cz-btn { flex: 1 1 auto; }
+  .cz-hero-facts { display: grid; grid-template-columns: 1fr 1fr; }
+  .cz-hero-facts > div { padding-right: 0; margin-right: 0; border-right: 0; }
+  .cz-hero-facts > div:last-child { grid-column: 1 / -1; }
+  .cz-campus { padding-top: 40px; }
+  .cz-thought { top: 48px; font-size: 12px; }
+  .cz-lede { font-size: 16.5px; }
+  .cz-rules { grid-template-columns: 1fr; }
+  .cz-rules li, .cz-rules li + li { padding: 28px 0 0; border-left: 0; }
+  .cz-rule-n { font-size: 64px; }
+  .cz-faq summary { font-size: 17px; }
+  .cz-faq details p { padding-right: 0; }
+  .cz-form { padding: 28px 20px; border-radius: 22px; }
+  .cz-form-grid { grid-template-columns: 1fr; }
+  .cz-screen-top span:last-child { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cz *, .cz *::before, .cz *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .cz-ticker-track { animation: none; }
+  .cz-ghost-trail { stroke-dashoffset: 0; }
+  .cz-rings circle { animation: none; }
+  /* No pinned scroll scene: the lamps just sit there, all lit. */
+  .cz-lifelines-sec { height: auto; padding: 120px 0; }
+  .cz-lifelines-pin { position: static; height: auto; }
+}

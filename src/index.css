@@ -1,0 +1,236 @@
+/* Global styles this page inherits from the Melsoft site (melsoft-website/src/index.css),
+   copied verbatim so the page renders exactly as it does there. Only the rules that
+   can reach this page are included: fonts, tokens, base resets, the Canela heading
+   rule, and the element-level mobile overrides (headings, footer). */
+
+@font-face {
+  font-family: "Canela";
+  src: url("/canela-collection/Canela Family/Canela-Bold-Trial.woff2")
+    format("woff2");
+  font-weight: bold;
+  font-style: normal;
+  /* Show headlines in the fallback serif immediately, swap when loaded —
+     prevents invisible-text (FOIT) while the font downloads. Subsetting to
+     Latin took this from 74 KB OTF to 8.7 KB WOFF2 (npm run fonts). */
+  font-display: swap;
+}
+
+/* Metric-matched fallback. font-display:swap means headlines first paint in
+   the fallback serif and then re-flow when Canela arrives — a re-flow of the
+   76px hero <h1> is a large layout shift, and layout shift was 0.30 against
+   a 0.1 target in the Jul 2026 audit.
+
+   Overriding the fallback's metrics to Canela's own makes the swap
+   invisible. Canela Bold reports unitsPerEm 1000, ascender 775,
+   descender -225, lineGap 200, xAvgCharWidth 545 (read from the OTF's
+   head/hhea/OS-2 tables). size-adjust is Canela's average glyph width over
+   Georgia's; the ascent/descent/line-gap overrides are then divided by that
+   ratio, per the CSS Fonts 5 definition.
+
+   NOTE: size-adjust is derived from Georgia's published metrics rather than
+   measured in a browser, so it is close but worth confirming with the
+   Chrome DevTools layout-shift overlay on a slow connection. The
+   ascent/descent overrides are exact — they come from Canela itself — and
+   they are what removes most of the vertical movement. */
+@font-face {
+  font-family: "Canela Fallback";
+  src: local("Georgia"), local("Times New Roman"), local("Times");
+  size-adjust: 106.3%;
+  ascent-override: 72.9%;
+  descent-override: 21.2%;
+  line-gap-override: 18.8%;
+}
+/* The Canela Trial files carry no "%" or "—" glyph (verified by loading
+   every family in the collection: each paints those two characters from a
+   fallback). Inside a headline that meant "92%", "30% off." showed a Georgia
+   percent beside Canela digits. This face covers just those two code points
+   from the system sans, so a percent in a headline reads as a deliberate
+   sans lockup instead of a stray fallback glyph. Declared AFTER the real
+   face so it wins only on the code points it names; every other character
+   still comes from Canela Bold. size-adjust pulls Arial's wide percent in
+   to sit with Canela's figures. */
+@font-face {
+  font-family: "Canela";
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Arial"), local("Helvetica Neue"), local("Helvetica");
+  font-weight: bold;
+  unicode-range: U+25, U+2014;
+  size-adjust: 88%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.display-h1,
+.display-h2,
+.h1-display,
+.hero-h1 {
+  font-family: "Canela", "Canela Fallback", serif !important;
+  font-weight: bold !important;
+}
+
+/* Body-copy fallback, same idea as "Canela Fallback" above. Lighthouse named
+   the Inter webfont as a cause of the footer layout shift: body text first
+   paints in system-ui, then Inter arrives with different metrics and every
+   block reflows. Inter reports unitsPerEm 2048, ascender 1984, descender
+   -494, xAvgCharWidth 1121; the numbers below map those onto Arial/Helvetica
+   (the system-ui serif-less stand-in on both macOS and Windows). */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
+  size-adjust: 107.1%;
+  ascent-override: 90.4%;
+  descent-override: 22.5%;
+  line-gap-override: 0%;
+}
+
+
+:root {
+  --primary: #0a1733;
+  --primary-deep: #060e22;
+  --maroon: #5e0743;
+  --orange: #ff7300;
+  --purple: #720075;
+  --ink: #0a1733;
+  --ink-2: #1a2545;
+  --text-2: #5b6478;
+  /* Was #8a93a8, which measured 3.08:1 on white and 2.90:1 on --surface —
+     below the 4.5:1 WCAG AA minimum for body text, and the cause of every
+     contrast failure in the Jul 2026 accessibility audit (it is the colour
+     of the small 13px meta labels that appear throughout the site).
+     #646c85 keeps the same cool grey but measures 5.22:1 on white and
+     4.91:1 on --surface, so it passes on both site backgrounds. */
+  --text-3: #646c85;
+  --line: #e5e8f0;
+  --line-2: #ccd2df;
+  --surface: #f7f8fb;
+  --surface-2: #eef1f7;
+  --bg: #ffffff;
+  --accent-yellow: #ff7300;
+  --accent-red: #5e0743;
+  --gradient-hero: linear-gradient(
+    135deg,
+    #0a1733 0%,
+    #720075 60%,
+    #ff7300 100%
+  );
+  --tint-peach: #ffe6d1;
+  --tint-rose: #fbdde5;
+  --tint-lilac: #eadbf6;
+  --tint-mint: #d5efe2;
+  --tint-sky: #dde6f8;
+  --tint-cream: #fff6e5;
+  --rad-card: 20px;
+  --rad-pill: 100px;
+  --rad-chip: 8px;
+  /* Radius + elevation scale (used by case-study + card surfaces) */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 34px;
+  --shadow-soft: 0 6px 24px -12px rgba(10, 23, 51, 0.16);
+  --shadow-lifted: 0 26px 50px -20px rgba(10, 23, 51, 0.28);
+  --shadow-deep: 0 34px 80px -28px rgba(10, 23, 51, 0.42);
+  --grad-ink: linear-gradient(120deg, #0a1733 0%, #5e0743 46%, #ff7300 100%);
+  --grad-ink-soft: linear-gradient(
+    120deg,
+    #720075 0%,
+    #5e0743 55%,
+    #ff7300 100%
+  );
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", "Inter Fallback", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Uniform breathing room between page sections, site-wide. Applies to the raw
+   <section> tag rather than a shared component, since every section on every
+   page composes its spacing from its own inline padding — this is the one
+   place that adds a consistent gap on top of whatever each section already
+   does.
+
+   The adjacent-sibling selector (not a blanket `section`) is deliberate: each
+   page's first section is its hero, sitting directly under the fixed nav via
+   .nav-spacer, which already positions it precisely. A blanket rule adds this
+   margin there too, shoving the hero down and opening a gap between the nav
+   and the hero's own background. `section + section` only matches a section
+   that has another section immediately before it, so the hero is left alone
+   and only the gaps BETWEEN sections get the new spacing. */
+section + section {
+  margin-top: 64px;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+@media (max-width: 1080px) {
+  h2 {
+    font-size: 32px !important;
+    line-height: 1.1 !important;
+  }
+
+  h3 {
+    font-size: 22px !important;
+  }
+}
+
+@media (max-width: 720px) {
+  footer img[alt="Melsoft Academy"] {
+    height: auto !important;
+    width: auto !important;
+    max-height: 96px;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  h2 {
+    font-size: 26px !important;
+  }
+
+  h3 {
+    font-size: 20px !important;
+  }
+}
+
+@media (max-width: 560px) {
+  footer {
+    padding: 72px 24px 40px !important;
+  }
+}
