@@ -29,7 +29,7 @@
  *     the appendRow array together.
  */
 
-var SHEET_ID   = "PASTE_SHEET_ID_HERE";
+var SHEET_ID   = "13KbK4JBat9LOvLfBY02FP0jdEgdLPSAQGN-gR0qK6ns";
 var SHEET_NAME = "Team registrations";
 
 var CONFIG = {
@@ -44,7 +44,7 @@ var CONFIG = {
 var HEADERS = [
   "Timestamp", "Team name", "Occupation", "Team size",
   "Captain", "Email", "Phone", "Human in the chair", "Stack",
-  "Source", "Confirmation email", "Status",
+  "Source", "Confirmation email", "Status", "Teammates",
 ];
 
 // ── Entry point ────────────────────────────────────────────────────────────
@@ -89,8 +89,10 @@ function appendRegistration_(d, mailStatus) {
   sheet.appendRow([
     d.timestamp || new Date().toISOString(),
     d.teamName || "", d.organisation || "", d.teamSize || "",
-    d.captainName || "", d.email || "", d.phone || "", d.chairName || "", d.stack || "",
-    d.source || "direct", mailStatus, "Registered",
+    // Leading apostrophe keeps Sheets from reading the phone as a number,
+    // which drops the 0 in 082… and mangles +27….
+    d.captainName || "", d.email || "", d.phone ? "'" + d.phone : "", d.chairName || "", d.stack || "",
+    d.source || "direct", mailStatus, "Registered", d.members || "",
   ]);
 }
 
@@ -134,7 +136,7 @@ function notifyTeam_(d) {
   var rows = [
     ["Team", d.teamName], ["Occupation", d.organisation], ["Team size", d.teamSize],
     ["Captain", d.captainName], ["Email", d.email], ["Phone", d.phone],
-    ["In the chair", d.chairName], ["Stack", d.stack], ["Source", d.source],
+    ["Teammates", d.members], ["In the chair", d.chairName], ["Source", d.source],
   ];
   var table = rows.map(function (r) {
     return "<tr><td style=\"padding:4px 12px 4px 0;color:#5b6478\">" + esc_(r[0]) + "</td><td style=\"padding:4px 0\">" + esc_(r[1] || "—") + "</td></tr>";

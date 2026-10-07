@@ -472,6 +472,46 @@
 .cz-size-opt:has(input:focus-visible) { box-shadow: 0 0 0 4px rgba(94, 7, 67, 0.15); border-color: var(--cz-maroon); }
 .cz-size-opt.is-on { background: var(--cz-maroon); border-color: var(--cz-maroon); color: #fff; }
 .cz-size.has-error .cz-size-opt { border-color: rgba(94, 7, 67, 0.5); }
+
+/* Team size ⇄ teammates. Both panels live in one full-width slot; the open
+   one gets 1fr of height and the other folds to 0, so the swap is a single
+   smooth slide rather than a jump. Padding plus a matching negative margin
+   keeps focus rings from being clipped by the overflow. */
+.cz-team { grid-column: 1 / -1; display: grid; }
+.cz-fold {
+  display: grid; grid-template-rows: 0fr; opacity: 0;
+  transition: grid-template-rows 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
+}
+.cz-fold-inner { min-height: 0; overflow: hidden; padding: 4px; margin: -4px; }
+.cz-fold.is-open { grid-template-rows: 1fr; opacity: 1; transition-delay: 0s, 0.1s; }
+.cz-members {
+  background: var(--surface); border: 1.5px solid var(--line); border-radius: 16px;
+  padding: 16px; margin: 0;
+}
+/* Floated so the legend sits inside the box instead of notching its border. */
+.cz-members legend { float: left; width: 100%; margin-bottom: 12px; }
+.cz-members-grid { clear: both; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cz-member { display: flex; flex-direction: column; gap: 6px; animation: cz-member-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.cz-member.is-leaving { animation: cz-member-out 0.22s ease forwards; pointer-events: none; }
+.cz-member-box { position: relative; }
+.cz-member-box input { padding-right: 46px; }
+.cz-member.has-error input { border-color: var(--cz-maroon); }
+.cz-member-x {
+  position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+  display: grid; place-items: center; width: 32px; height: 32px;
+  border: 0; border-radius: 8px; background: transparent; color: var(--text-3); cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.cz-member-x:hover { background: rgba(94, 7, 67, 0.08); color: var(--cz-maroon); }
+.cz-member-x:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(94, 7, 67, 0.25); color: var(--cz-maroon); }
+.cz-member-add {
+  min-height: 52px; border: 1.5px dashed var(--line-2); border-radius: 12px; background: transparent;
+  font: inherit; font-size: 14px; font-weight: 600; color: var(--text-2); cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.cz-member-add:hover, .cz-member-add:focus-visible { outline: none; border-color: var(--cz-maroon); color: var(--cz-maroon); }
+@keyframes cz-member-in { from { opacity: 0; transform: translateY(-8px) scale(0.98); } }
+@keyframes cz-member-out { to { opacity: 0; transform: scale(0.96); } }
 .cz-form-error { margin-top: 20px; background: var(--surface); border: 1px solid var(--cz-maroon); color: var(--cz-maroon); padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.45; }
 .cz-form .cz-btn--block { margin-top: 28px; }
 .cz-form-fine { margin-top: 14px; font-size: 12.5px; line-height: 1.5; color: var(--text-3); text-align: center; }
@@ -622,6 +662,7 @@
   .cz-faq details p { padding-right: 0; }
   .cz-form { padding: 28px 20px; border-radius: 22px; }
   .cz-form-grid { grid-template-columns: 1fr; }
+  .cz-members-grid { grid-template-columns: 1fr; }
   .cz-screen-top span:last-child { display: none; }
 }
 

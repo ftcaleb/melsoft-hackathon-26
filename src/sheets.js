@@ -33,7 +33,8 @@ export function getLeadSource() {
 // one-time deployment steps. Paste the deployed Web app URL (ends in /exec)
 // here. Until then the form refuses to submit on the live site, rather than
 // show a team a confirmation for a registration nobody received.
-export const GSHEET_HACKATHON_ENDPOINT = "PASTE_HACKATHON_WEB_APP_URL";
+export const GSHEET_HACKATHON_ENDPOINT =
+  "https://script.google.com/macros/s/AKfycbz-nI6XeO0VTLoUY0BcKY6QM-BNVXW_AvVWNkT-O7JcDbqMSJrIqemM8WLKx5Q29WLJUg/exec";
 
 export const hackathonConfigured = () =>
   Boolean(GSHEET_HACKATHON_ENDPOINT) && !GSHEET_HACKATHON_ENDPOINT.startsWith("PASTE_");

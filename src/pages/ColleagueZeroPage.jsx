@@ -551,16 +551,68 @@ function Faq() {
 /* ── Registration form ───────────────────────────────────────────────── */
 
 const EMPTY = { teamName: "", captainName: "", email: "", phone: "", organisation: "", teamSize: "", chairName: "" };
+const TEAM_MAX = 5;
+// Matches the member row's exit animation in ColleagueZero.css.
+const MEMBER_EXIT_MS = 220;
+
+let memberSeq = 0;
+const newMember = () => ({ id: ++memberSeq, name: "", leaving: false });
 
 function RegisterForm({ navigate }) {
   const [data, setData] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  // Everyone besides the captain. Picking a team size opens one row per
+  // teammate; the size the sheet gets is always these plus the captain.
+  const [members, setMembers] = useState([]);
+  const focusRef = useRef(null);
 
   const update = (key, value) => {
     setData((d) => ({ ...d, [key]: value }));
     if (errors[key]) setErrors((e) => ({ ...e, [key]: "" }));
+  };
+
+  const present = members.filter((m) => !m.leaving);
+  const teamOpen = present.length > 0;
+
+  // Move focus once React has rendered the row (or the picker) it points at.
+  useEffect(() => {
+    if (!focusRef.current) return;
+    document.getElementById(focusRef.current)?.focus({ preventScroll: true });
+    focusRef.current = null;
+  });
+
+  const pickSize = (n) => {
+    const rows = Array.from({ length: Number(n) - 1 }, newMember);
+    setMembers(rows);
+    update("teamSize", n);
+    focusRef.current = "cz-m" + rows[0].id;
+  };
+
+  const addMember = () => {
+    const row = newMember();
+    setMembers((ms) => [...ms, row]);
+    update("teamSize", String(present.length + 2));
+    focusRef.current = "cz-m" + row.id;
+  };
+
+  const removeMember = (id) => {
+    const i = present.findIndex((m) => m.id === id);
+    const left = present.length - 1;
+    // Played out in CSS first, then dropped, so the row slides away
+    // rather than vanishing.
+    setMembers((ms) => ms.map((m) => (m.id === id ? { ...m, leaving: true } : m)));
+    setTimeout(() => setMembers((ms) => ms.filter((m) => m.id !== id)), MEMBER_EXIT_MS);
+    setErrors((e) => ({ ...e, ["m" + id]: "" }));
+    update("teamSize", left ? String(left + 1) : "");
+    const next = present[i + 1] || present[i - 1];
+    focusRef.current = left ? "cz-m" + next.id : "cz-teamSize";
+  };
+
+  const updateMember = (id, name) => {
+    setMembers((ms) => ms.map((m) => (m.id === id ? { ...m, name } : m)));
+    if (errors["m" + id]) setErrors((e) => ({ ...e, ["m" + id]: "" }));
   };
 
   const validate = () => {
@@ -571,6 +623,9 @@ function RegisterForm({ navigate }) {
     if (data.phone.replace(/\D/g, "").length < 9) errs.phone = "Enter a valid phone number";
     if (!data.organisation.trim()) errs.organisation = "Required";
     if (!data.teamSize) errs.teamSize = "Pick a team size";
+    present.forEach((m) => {
+      if (!m.name.trim()) errs["m" + m.id] = "Add their name, or remove them";
+    });
     setErrors(errs);
     const first = Object.keys(errs)[0];
     if (first) document.getElementById("cz-" + first)?.focus();
@@ -592,6 +647,7 @@ function RegisterForm({ navigate }) {
       organisation: data.organisation.trim(),
       teamSize: data.teamSize,
       chairName: data.chairName.trim(),
+      members: present.map((m) => m.name.trim()).join(", "),
       source: getLeadSource(),
     };
 
@@ -657,27 +713,85 @@ function RegisterForm({ navigate }) {
         {field("email", "Captain's email", { type: "email", placeholder: "you@example.com", autoComplete: "email" })}
         {field("phone", "Captain's phone", { type: "tel", placeholder: "082 123 4567", autoComplete: "tel" })}
 
-        <fieldset className={"cz-field cz-size" + (errors.teamSize ? " has-error" : "")}>
-          <legend>Team size</legend>
-          <div className="cz-size-row">
-            {["2", "3", "4", "5"].map((n, i) => (
-              <label key={n} className={"cz-size-opt" + (data.teamSize === n ? " is-on" : "")}>
-                <input
-                  type="radio" name="teamSize" value={n}
-                  id={i === 0 ? "cz-teamSize" : undefined}
-                  checked={data.teamSize === n}
-                  onChange={() => update("teamSize", n)}
-                  disabled={submitting}
-                />
-                {n}
-              </label>
-            ))}
-          </div>
-          {errors.teamSize && <span className="cz-field-err">{errors.teamSize}</span>}
-        </fieldset>
-      </div>
+        {field("chairName", "Who sits in the chair? (optional)", { placeholder: "The human who answers escalations", autoComplete: "off" })}
 
-      {field("chairName", "Who sits in the chair? (optional)", { placeholder: "The human who answers escalations", autoComplete: "off" })}
+        {/* Team size and the teammates' names share one slot: picking a size
+            folds the picker away and slides the names open in its place. */}
+        <div className="cz-team">
+          <div className={"cz-fold" + (teamOpen ? "" : " is-open")} inert={teamOpen}>
+            <div className="cz-fold-inner">
+            <fieldset className={"cz-field cz-size" + (errors.teamSize ? " has-error" : "")}>
+              <legend>Team size</legend>
+              <div className="cz-size-row">
+                {["2", "3", "4", "5"].map((n, i) => (
+                  <label key={n} className={"cz-size-opt" + (data.teamSize === n ? " is-on" : "")}>
+                    <input
+                      type="radio" name="teamSize" value={n}
+                      id={i === 0 ? "cz-teamSize" : undefined}
+                      checked={data.teamSize === n}
+                      onChange={() => pickSize(n)}
+                      disabled={submitting}
+                    />
+                    {n}
+                  </label>
+                ))}
+              </div>
+              {errors.teamSize && <span className="cz-field-err">{errors.teamSize}</span>}
+            </fieldset>
+            </div>
+          </div>
+
+          <div className={"cz-fold" + (teamOpen ? " is-open" : "")} inert={!teamOpen}>
+            <div className="cz-fold-inner">
+            <fieldset className="cz-field cz-members">
+              <legend>
+                Your team <span>· {present.length + 1} of you, including {data.captainName.trim() || "your captain"}</span>
+              </legend>
+              <div className="cz-members-grid">
+                {members.map((m) => {
+                  const n = present.indexOf(m) + 2; // teammate number, captain is 1
+                  return (
+                  <div
+                    key={m.id}
+                    className={"cz-member" + (m.leaving ? " is-leaving" : "") + (errors["m" + m.id] ? " has-error" : "")}
+                  >
+                    <div className="cz-member-box">
+                      <input
+                        id={"cz-m" + m.id}
+                        value={m.name}
+                        onChange={(e) => updateMember(m.id, e.target.value)}
+                        placeholder={m.leaving ? "" : `Teammate ${n}, full name`}
+                        aria-label={`Teammate ${n} name`}
+                        aria-invalid={Boolean(errors["m" + m.id])}
+                        aria-describedby={errors["m" + m.id] ? `cz-m${m.id}-err` : undefined}
+                        autoComplete="off"
+                        disabled={submitting || m.leaving}
+                      />
+                      <button
+                        type="button"
+                        className="cz-member-x"
+                        onClick={() => removeMember(m.id)}
+                        aria-label={`Remove teammate ${n}`}
+                        disabled={submitting || m.leaving}
+                      >
+                        <Icon name="close" size={16} strokeWidth={2.4} />
+                      </button>
+                    </div>
+                    {errors["m" + m.id] && <span className="cz-field-err" id={`cz-m${m.id}-err`}>{errors["m" + m.id]}</span>}
+                  </div>
+                  );
+                })}
+                {present.length + 1 < TEAM_MAX && (
+                  <button type="button" className="cz-member-add" onClick={addMember} disabled={submitting}>
+                    + Add a teammate
+                  </button>
+                )}
+              </div>
+            </fieldset>
+            </div>
+          </div>
+        </div>
+      </div>
 
 
       {submitError && <div className="cz-form-error" role="alert">{submitError}</div>}
