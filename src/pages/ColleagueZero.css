@@ -472,20 +472,6 @@
 .cz-size-opt:has(input:focus-visible) { box-shadow: 0 0 0 4px rgba(94, 7, 67, 0.15); border-color: var(--cz-maroon); }
 .cz-size-opt.is-on { background: var(--cz-maroon); border-color: var(--cz-maroon); color: #fff; }
 .cz-size.has-error .cz-size-opt { border-color: rgba(94, 7, 67, 0.5); }
-.cz-stack { margin-top: 18px; }
-.cz-stack legend { margin-bottom: 10px; }
-.cz-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.cz-chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-family: inherit; font-size: 14px; font-weight: 600;
-  padding: 9px 14px; border-radius: 100px;
-  border: 1.5px solid var(--line); background: #fff; color: var(--ink-2);
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-.cz-chip:hover { border-color: var(--line-2); }
-.cz-chip:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(94, 7, 67, 0.15); border-color: var(--cz-maroon); }
-.cz-chip.is-on { background: var(--cz-maroon); border-color: var(--cz-maroon); color: #fff; }
 .cz-form-error { margin-top: 20px; background: var(--surface); border: 1px solid var(--cz-maroon); color: var(--cz-maroon); padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.45; }
 .cz-form .cz-btn--block { margin-top: 28px; }
 .cz-form-fine { margin-top: 14px; font-size: 12.5px; line-height: 1.5; color: var(--text-3); text-align: center; }

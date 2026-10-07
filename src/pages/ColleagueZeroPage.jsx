@@ -26,7 +26,8 @@ import "./ColleagueZero.css";
 
 // Set these and every mention on the page updates.
 const EVENT = {
-  date: "Wednesday, 18 November 2026",
+  date: "Friday, 13 November 2026",
+  dateShort: "13 November 2026", // hero facts row, where the weekday won't fit
   venue: "at Melsoft Academy, 173 Oxford Road, Rosebank, and online",
 };
 
@@ -206,7 +207,7 @@ function Manifesto() {
         </p>
         <dl className="cz-stats">
           <div><dt>Campus</dt><dd>1</dd></div>
-          <div><dt>Hidden tests</dt><dd>7</dd></div>
+          <div><dt>Hidden tests</dt><dd>3</dd></div>
           <div><dt>Lifelines</dt><dd>5</dd></div>
           <div><dt>Verdict</dt><dd>1</dd></div>
         </dl>
@@ -270,11 +271,11 @@ function Dossier() {
       <div className="cz-wrap cz-split">
         <div className="cz-split-aside">
           <Eyebrow n="03">The hidden tests</Eyebrow>
-          <h2 className="cz-h2">Seven hidden tests.</h2>
-          <p className="cz-lede">None of them are labelled. Working out what's being asked is the job.</p>
+          <h2 className="cz-h2">Three hidden tests.</h2>
+          <p className="cz-lede">Seven traps, spread across them. None are labelled. Working out what's being asked is the job.</p>
           <span className="cz-dossier-stamp cz-mono" aria-hidden="true">Classified</span>
         </div>
-        <ol className="cz-dossier" aria-label="Seven redacted test descriptions">
+        <ol className="cz-dossier" aria-label="Seven redacted traps across the three tests">
           {DOSSIER.map(([before, secret, after], i) => (
             <li key={i}>
               <span className="cz-dossier-n cz-mono">{String(i + 1).padStart(2, "0")}</span>
@@ -549,8 +550,7 @@ function Faq() {
 
 /* ── Registration form ───────────────────────────────────────────────── */
 
-const STACKS = ["Claude Agent SDK", "OpenAI Agents SDK", "LangGraph", "CrewAI", "AutoGen", "Our own", "Not sure yet"];
-const EMPTY = { teamName: "", captainName: "", email: "", phone: "", organisation: "", teamSize: "", chairName: "", stack: [] };
+const EMPTY = { teamName: "", captainName: "", email: "", phone: "", organisation: "", teamSize: "", chairName: "" };
 
 function RegisterForm({ navigate }) {
   const [data, setData] = useState(EMPTY);
@@ -562,8 +562,6 @@ function RegisterForm({ navigate }) {
     setData((d) => ({ ...d, [key]: value }));
     if (errors[key]) setErrors((e) => ({ ...e, [key]: "" }));
   };
-  const toggleStack = (s) =>
-    setData((d) => ({ ...d, stack: d.stack.includes(s) ? d.stack.filter((x) => x !== s) : [...d.stack, s] }));
 
   const validate = () => {
     const errs = {};
@@ -594,7 +592,6 @@ function RegisterForm({ navigate }) {
       organisation: data.organisation.trim(),
       teamSize: data.teamSize,
       chairName: data.chairName.trim(),
-      stack: data.stack.join(", "),
       source: getLeadSource(),
     };
 
@@ -655,7 +652,7 @@ function RegisterForm({ navigate }) {
 
       <div className="cz-form-grid">
         {field("teamName", "Team name", { placeholder: "e.g. Null Pointers", autoComplete: "off" })}
-        {field("organisation", "University, company or community", { placeholder: "e.g. Wits, or Acme (Pty) Ltd", autoComplete: "organization" })}
+        {field("organisation", "Occupation", { placeholder: "e.g. Student, developer, analyst", autoComplete: "organization-title" })}
         {field("captainName", "Team captain", { placeholder: "Full name", autoComplete: "name" })}
         {field("email", "Captain's email", { type: "email", placeholder: "you@example.com", autoComplete: "email" })}
         {field("phone", "Captain's phone", { type: "tel", placeholder: "082 123 4567", autoComplete: "tel" })}
@@ -682,23 +679,6 @@ function RegisterForm({ navigate }) {
 
       {field("chairName", "Who sits in the chair? (optional)", { placeholder: "The human who answers escalations", autoComplete: "off" })}
 
-      <fieldset className="cz-field cz-stack">
-        <legend>What will you build with? <span>(optional, pick any)</span></legend>
-        <div className="cz-chips">
-          {STACKS.map((s) => (
-            <button
-              type="button" key={s}
-              className={"cz-chip" + (data.stack.includes(s) ? " is-on" : "")}
-              aria-pressed={data.stack.includes(s)}
-              onClick={() => toggleStack(s)}
-              disabled={submitting}
-            >
-              {data.stack.includes(s) && <Icon name="check" size={14} strokeWidth={2.6} />}
-              {s}
-            </button>
-          ))}
-        </div>
-      </fieldset>
 
       {submitError && <div className="cz-form-error" role="alert">{submitError}</div>}
 
@@ -774,7 +754,7 @@ const ColleagueZeroPage = ({ navigate }) => {
             <dl className="cz-hero-facts">
               <div><dt>Verdict</dt><dd>Hired <i>or</i> Not hired</dd></div>
               <div><dt>Lifelines</dt><dd>5</dd></div>
-              <div><dt>Date</dt><dd>{EVENT.date || "Announcing soon"}</dd></div>
+              <div><dt>Date</dt><dd>{EVENT.dateShort || "Announcing soon"}</dd></div>
             </dl>
           </div>
           <div className="cz-hero-stage">

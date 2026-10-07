@@ -37,12 +37,12 @@ var CONFIG = {
   REPLY_TO:     "hello@melsoftacademy.com",
   NOTIFY_EMAIL: "hello@melsoftacademy.com", // gets a heads-up per team
   // Fill these in once they're confirmed; the email leaves them out until then.
-  EVENT_DATE_TEXT: "Wednesday, 18 November 2026",
+  EVENT_DATE_TEXT: "Friday, 13 November 2026",
   EVENT_VENUE_TEXT: "Melsoft Academy, 173 Oxford Road, Rosebank, and online",
 };
 
 var HEADERS = [
-  "Timestamp", "Team name", "Organisation", "Team size",
+  "Timestamp", "Team name", "Occupation", "Team size",
   "Captain", "Email", "Phone", "Human in the chair", "Stack",
   "Source", "Confirmation email", "Status",
 ];
@@ -132,7 +132,7 @@ function sendConfirmationEmail_(d) {
 function notifyTeam_(d) {
   if (!CONFIG.NOTIFY_EMAIL) return;
   var rows = [
-    ["Team", d.teamName], ["Organisation", d.organisation], ["Team size", d.teamSize],
+    ["Team", d.teamName], ["Occupation", d.organisation], ["Team size", d.teamSize],
     ["Captain", d.captainName], ["Email", d.email], ["Phone", d.phone],
     ["In the chair", d.chairName], ["Stack", d.stack], ["Source", d.source],
   ];
