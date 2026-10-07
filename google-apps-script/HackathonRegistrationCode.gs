@@ -37,7 +37,7 @@ var CONFIG = {
   REPLY_TO:     "hello@melsoftacademy.com",
   NOTIFY_EMAIL: "hello@melsoftacademy.com", // gets a heads-up per team
   // Fill these in once they're confirmed; the email leaves them out until then.
-  EVENT_DATE_TEXT: "",  // e.g. "Saturday, 21 November 2026"
+  EVENT_DATE_TEXT: "Wednesday, 18 November 2026",
   EVENT_VENUE_TEXT: "", // e.g. "Melsoft Academy, 173 Oxford Road, Rosebank"
 };
 

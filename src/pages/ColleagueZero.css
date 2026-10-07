@@ -13,8 +13,8 @@
   --cz-navy: var(--primary, #0a1733);
   --cz-maroon: var(--maroon, #5e0743);
   --cz-maroon-2: #7a1259;
-  --cz-mono: ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
-  --cz-serif: "Canela", "Canela Fallback", serif;
+  --cz-mono: "Inter", "Inter Fallback", system-ui, sans-serif;
+  --cz-serif: "Inter", "Inter Fallback", system-ui, sans-serif;
   --cz-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --cz-grid: rgba(10, 23, 51, 0.05);
   color: var(--ink);

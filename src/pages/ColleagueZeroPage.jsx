@@ -24,9 +24,9 @@ import "./ColleagueZero.css";
    escalations are scored: that would prepare teams for a challenge whose
    point is working it out on the day. */
 
-// Not in the brief yet. Set these and every mention on the page updates.
+// Set these and every mention on the page updates.
 const EVENT = {
-  date: null, // e.g. "Saturday, 21 November 2026"
+  date: "Wednesday, 18 November 2026",
   venue: null, // e.g. "Melsoft Academy, Rosebank"
 };
 
@@ -518,7 +518,7 @@ const FAQS = [
   {
     q: "When and where?",
     a: EVENT.date
-      ? `${EVENT.date}${EVENT.venue ? `, ${EVENT.venue}` : ""}.`
+      ? `${EVENT.date}${EVENT.venue ? `, ${EVENT.venue}.` : ". Venue announced to registered teams first."}`
       : "Announcing soon. Registered teams hear first, along with the full brief and early access to the MCP server.",
   },
 ];
@@ -841,7 +841,7 @@ export const ColleagueZeroRegisteredPage = ({ navigate }) => {
     { t: "Application received", v: "Your team is on the list.", done: true },
     { t: "The brief lands", v: reg ? `Sent to ${reg.email}, with MCP access details.` : "Sent to your captain, with MCP access details." },
     { t: "Build", v: "Cooperating agents that reason, check their work and know when to ask." },
-    { t: "Day one in the Main", v: EVENT.date ? `${EVENT.date}${EVENT.venue ? `, ${EVENT.venue}` : ""}.` : "Date and venue announced to registered teams first." },
+    { t: "Day one in the Main", v: EVENT.date ? `${EVENT.date}${EVENT.venue ? `, ${EVENT.venue}.` : ". Venue announced to registered teams first."}` : "Date and venue announced to registered teams first." },
     { t: "The verdict", v: "Hired, or not hired." },
   ];
 
