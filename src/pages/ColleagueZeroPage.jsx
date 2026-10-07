@@ -27,7 +27,7 @@ import "./ColleagueZero.css";
 // Set these and every mention on the page updates.
 const EVENT = {
   date: "Wednesday, 18 November 2026",
-  venue: null, // e.g. "Melsoft Academy, Rosebank"
+  venue: "online",
 };
 
 const REGISTERED_PATH = "/colleague-zero/registered";
@@ -449,7 +449,7 @@ function Broadcast() {
 const RULES = [
   { t: "First contact", v: "The first agent to finish a real task gets the room's first big moment." },
   { t: "Clever beats cheating", v: "Smart shortcuts inside the rules score. Find a bug and report it: there's a bounty." },
-  { t: "Fair timing", v: "Response time is measured on our server. Venue Wi-Fi can't slow you down." },
+  { t: "Fair timing", v: "Response time is measured on our server. Your own Wi-Fi can't slow you down." },
   { t: "No hands on the wheel", v: "During a run, humans act only through the escalation console. Every touch counts." },
 ];
 
