@@ -37,14 +37,14 @@ var CONFIG = {
   REPLY_TO:     "hello@melsoftacademy.com",
   NOTIFY_EMAIL: "hello@melsoftacademy.com", // gets a heads-up per team
   // Fill these in once they're confirmed; the email leaves them out until then.
-  EVENT_DATE_TEXT: "Friday, 13 November 2026",
-  EVENT_VENUE_TEXT: "Melsoft Academy, 173 Oxford Road, Rosebank, and online",
+  EVENT_DATE_TEXT: "Starts 11:00, Friday 13 November 2026 (online). Ends Saturday 14 November: doors open 09:00, hacking ends 11:00, presentations 12:00.",
+  EVENT_VENUE_TEXT: "Day one online. Day two at the Melsoft offices, 173 Oxford Road, Rosebank.",
 };
 
 var HEADERS = [
   "Timestamp", "Team name", "Occupation", "Team size",
   "Captain", "Email", "Phone", "Human in the chair", "Stack",
-  "Source", "Confirmation email", "Status", "Teammates",
+  "Source", "Confirmation email", "Status", "Teammates", "Joining as", "In person",
 ];
 
 // ── Entry point ────────────────────────────────────────────────────────────
@@ -56,7 +56,8 @@ function doPost(e) {
     if (data.type !== "hackathon_registration") {
       return json_({ result: "error", error: "Unexpected payload type: " + data.type });
     }
-    if (!data.email || !data.teamName) {
+    var solo = data.joiningAs === "Individual";
+    if (!data.email || (!solo && !data.teamName)) {
       return json_({ result: "error", error: "Missing email or team name" });
     }
 
@@ -93,6 +94,7 @@ function appendRegistration_(d, mailStatus) {
     // which drops the 0 in 082… and mangles +27….
     d.captainName || "", d.email || "", d.phone ? "'" + d.phone : "", d.chairName || "", d.stack || "",
     d.source || "direct", mailStatus, "Registered", d.members || "",
+    d.joiningAs || "Team", d.inPerson || "",
   ]);
 }
 
@@ -107,26 +109,35 @@ function sendConfirmationEmail_(d) {
     ? "<div style=\"margin-top:6px\"><strong>Where:</strong> " + esc_(CONFIG.EVENT_VENUE_TEXT) + "</div>"
     : "";
 
+  var solo = d.joiningAs === "Individual";
+  var who = solo ? "You're" : "<strong>" + esc_(d.teamName) + "</strong> is";
+  var team = solo
+    ? "Joining as an individual"
+    : esc_(d.teamName) + " · " + esc_(d.teamSize || "?") + " people";
+  var inPerson = d.inPerson === "Yes"
+    ? (solo ? "You'll" : "Your team will") + " join day two in person."
+    : "Day two is in person at the Melsoft offices, if you can make it.";
+
   var htmlBody = "" +
     "<div style=\"font-family:Inter,Arial,sans-serif;font-size:15px;line-height:1.6;color:#0a1733;max-width:560px\">" +
     "<p>Hi " + esc_(name) + ",</p>" +
-    "<p><strong>" + esc_(d.teamName) + "</strong> is on the shortlist for Colleague Zero, the autonomous agent hackathon.</p>" +
+    "<p>" + who + " on the shortlist for Colleague Zero, the autonomous agent hackathon.</p>" +
     "<div style=\"border:1px solid #e5e8f0;border-left:4px solid #5e0743;border-radius:12px;padding:16px 18px;margin:16px 0\">" +
     "<div style=\"font-size:18px;font-weight:700\">Colleague Zero</div>" +
     when + where +
-    "<div style=\"margin-top:6px\"><strong>Team:</strong> " + esc_(d.teamName) + " · " + esc_(d.teamSize || "?") + " people</div>" +
+    "<div style=\"margin-top:6px\"><strong>Team:</strong> " + team + "</div>" +
     "</div>" +
-    "<p>What happens next: we'll send the full brief and your access details for the Main's MCP server. " +
-    "Start thinking about who sits in the chair. Your agent gets five lifelines, and how it uses them matters.</p>" +
-    "<p>Questions? Just reply to this email.</p>" +
-    "<p>See you in the Main,<br>" + esc_(CONFIG.SENDER_NAME) + "</p>" +
+    "<p>Build a digital colleague: a system of agents that is given a goal, plans the work, uses tools to do it, " +
+    "checks its own output and fixes what's wrong. Every project must solve a real problem in EdTech. " + inPerson + "</p>" +
+    "<p>Questions? Reply to this email or call us on 010 158 4346.</p>" +
+    "<p>See you there,<br>" + esc_(CONFIG.SENDER_NAME) + "</p>" +
     "</div>";
 
   MailApp.sendEmail({
     to: d.email,
     replyTo: CONFIG.REPLY_TO,
     name: CONFIG.SENDER_NAME,
-    subject: "You're on the shortlist: Colleague Zero · " + (d.teamName || ""),
+    subject: "You're on the shortlist: Colleague Zero" + (d.teamName ? " · " + d.teamName : ""),
     htmlBody: htmlBody,
   });
 }
@@ -134,9 +145,9 @@ function sendConfirmationEmail_(d) {
 function notifyTeam_(d) {
   if (!CONFIG.NOTIFY_EMAIL) return;
   var rows = [
-    ["Team", d.teamName], ["Occupation", d.organisation], ["Team size", d.teamSize],
+    ["Joining as", d.joiningAs], ["Team", d.teamName], ["Occupation", d.organisation], ["Team size", d.teamSize],
     ["Captain", d.captainName], ["Email", d.email], ["Phone", d.phone],
-    ["Teammates", d.members], ["In the chair", d.chairName], ["Source", d.source],
+    ["Teammates", d.members], ["In person (day two)", d.inPerson], ["Source", d.source],
   ];
   var table = rows.map(function (r) {
     return "<tr><td style=\"padding:4px 12px 4px 0;color:#5b6478\">" + esc_(r[0]) + "</td><td style=\"padding:4px 0\">" + esc_(r[1] || "—") + "</td></tr>";
@@ -144,7 +155,9 @@ function notifyTeam_(d) {
   MailApp.sendEmail({
     to: CONFIG.NOTIFY_EMAIL,
     name: "Melsoft website",
-    subject: "New Colleague Zero team: " + (d.teamName || "") + " (" + (d.organisation || "") + ")",
+    subject: d.joiningAs === "Individual"
+      ? "New Colleague Zero individual: " + (d.captainName || "") + " (" + (d.organisation || "") + ")"
+      : "New Colleague Zero team: " + (d.teamName || "") + " (" + (d.organisation || "") + ")",
     htmlBody: "<div style=\"font-family:Inter,Arial,sans-serif;font-size:14px;color:#0a1733\"><table>" + table + "</table></div>",
   });
 }
@@ -163,6 +176,11 @@ function getSheet_(sheetName, headers) {
     headerRange.setBackground("#5e0743");
     headerRange.setFontColor("#ffffff");
     sheet.setFrozenRows(1);
+  } else if (sheet.getLastColumn() < headers.length) {
+    var from = sheet.getLastColumn() + 1;
+    var added = sheet.getRange(1, from, 1, headers.length - from + 1);
+    added.setValues([headers.slice(from - 1)]);
+    added.setFontWeight("bold").setBackground("#5e0743").setFontColor("#ffffff");
   }
   return sheet;
 }

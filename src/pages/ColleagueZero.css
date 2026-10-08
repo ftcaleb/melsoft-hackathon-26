@@ -304,11 +304,7 @@
 .cz-places li:hover .cz-places-name { color: var(--cz-maroon); transform: translateX(6px); }
 .cz-places li:hover .cz-places-n { color: var(--cz-maroon); }
 
-/* 03 · The hidden tests, as a redacted dossier */
-/* Shared: heading beside its lede (used by The show). */
-.cz-measured-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: end; }
-.cz-measured-head .cz-lede { margin: 0 0 8px; }
-
+/* 03 · What a strong project does: a dossier that declassifies itself */
 .cz-dossier { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
 .cz-dossier li {
   display: grid; grid-template-columns: 36px minmax(0, 1fr);
@@ -317,58 +313,33 @@
   border-bottom: 1px solid var(--line-2);
 }
 .cz-dossier-n { color: var(--text-3); font-weight: 700; }
-.cz-dossier-line { font-size: 18px; line-height: 1.45; font-weight: 500; color: var(--ink); }
+.cz-dossier-line { font-size: 18px; line-height: 1.45; font-weight: 500; color: var(--text-2); }
 .cz-dossier-stamp {
-  display: inline-block; margin-top: 32px;
+  display: inline-grid; margin-top: 32px;
   color: var(--cz-maroon); font-weight: 700; font-size: 12px; letter-spacing: 0.24em;
   border: 2px solid currentColor; border-radius: 4px; padding: 6px 12px;
   transform: rotate(-6deg);
 }
-.cz-redact {
-  position: relative; display: inline-block;
-  background: var(--ink); border-radius: 3px;
-  padding: 0 6px; margin: 0 2px;
-  line-height: 1.15; vertical-align: baseline;
-  cursor: not-allowed;
+.cz-dossier-stamp > span { grid-area: 1 / 1; text-align: center; transition: opacity 0.2s ease; }
+.cz-stamp-b { opacity: 0; }
+/* The bar over each name: navy, wiped off right-to-left in turn. */
+.cz-reveal { position: relative; display: inline-block; margin-right: 4px; color: var(--cz-maroon); font-weight: 700; }
+.cz-reveal::after {
+  content: ""; position: absolute; inset: 1px -3px; border-radius: 3px;
+  background: var(--ink); transform-origin: right center;
+  transition: transform 0.55s var(--cz-ease) calc(0.25s + var(--i) * 0.16s);
 }
-.cz-redact-text { color: transparent; user-select: none; }
-.cz-redact-tip {
-  position: absolute; inset: 0; display: grid; place-items: center;
-  color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; white-space: nowrap;
-  opacity: 0; transition: opacity 0.2s ease;
-}
-.cz-redact:hover .cz-redact-tip,
-.cz-redact:active .cz-redact-tip { opacity: 1; }
-.cz-redact:hover { animation: czNope 0.35s ease; background: var(--cz-maroon); }
-@keyframes czNope { 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-2px); } 80% { transform: translateX(2px); } }
+.cz-dossier-wrap.is-open .cz-reveal::after { transform: scaleX(0); }
+/* Once the last bar has gone, the stamp is re-stamped. */
+.cz-dossier-wrap.is-open .cz-stamp-a { opacity: 0; transition-delay: 1.2s; }
+.cz-dossier-wrap.is-open .cz-stamp-b { opacity: 1; transition-delay: 1.2s; }
+.cz-dossier-wrap.is-open .cz-dossier-stamp { animation: czStamp 0.4s var(--cz-ease) 1.2s both; }
+@keyframes czStamp { 0% { transform: rotate(-6deg) scale(1); } 40% { transform: rotate(-3deg) scale(1.18); } 100% { transform: rotate(-6deg) scale(1); } }
 
-/* 04 · Lifelines: pinned while five lamps go out with the scroll */
-.cz-lifelines-sec { position: relative; height: 260vh; }
-/* Pinned by the data-pin attribute ColleagueZeroPage.jsx sets, not by
-   position: sticky (which can't engage under this site's html/body). */
-.cz-lifelines-pin { position: absolute; top: 0; left: 0; right: 0; height: 100vh; display: flex; align-items: center; }
-.cz-lifelines-sec[data-pin="on"] .cz-lifelines-pin { position: fixed; }
-.cz-lifelines-sec[data-pin="after"] .cz-lifelines-pin { top: auto; bottom: 0; }
-.cz-lifelines-pin .cz-eyebrow { justify-content: center; }
-.cz-lifelines-pin .cz-h2 { max-width: 900px; }
-.cz-lamps { display: flex; justify-content: center; gap: clamp(12px, 3vw, 40px); margin-top: 56px; }
-.cz-lamps span {
-  --off: clamp(0, calc((var(--p, 0) * 6 - (5 - var(--i)) - 0.33) * 4), 1);
-  position: relative;
-  width: clamp(52px, 11vw, 140px); aspect-ratio: 1;
-  border-radius: 50%;
-  border: 2px dashed var(--line-2);
-}
-.cz-lamps i {
-  position: absolute; inset: -2px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, var(--cz-maroon-2), var(--cz-maroon) 60%);
-  box-shadow: 0 0 0 calc(10px * (1 - var(--off))) rgba(94, 7, 67, 0.1), 0 24px 40px -16px rgba(94, 7, 67, 0.6);
-  opacity: calc(1 - var(--off));
-  transform: scale(calc(1 - var(--off) * 0.2));
-}
-.cz-lamps-count { margin-top: 28px; text-align: center; color: var(--cz-maroon); font-size: 14px; font-weight: 700; letter-spacing: 0.2em; }
-
-/* 06 · The twist: one big rotating sentence */
+/* 05 · Schedule: heading beside its lede */
+.cz-measured-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: end; }
+.cz-measured-head .cz-lede { margin: 0 0 8px; }
+/* 04 · Ideas: one big rotating sentence, then the full list */
 .cz-twist-line {
   margin-top: 32px;
   font-size: clamp(38px, 5.4vw, 84px); line-height: 1.04; letter-spacing: -0.035em;
@@ -384,7 +355,12 @@
 .cz-rotator > span.is-on { opacity: 1; transform: none; }
 .cz-rotator > span.is-out { opacity: 0; transform: translateY(-40%); }
 
-/* 07 · The show: a broadcast frame, not a card */
+.cz-cams { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.cz-cams li { padding-top: 18px; border-top: 1px solid var(--line-2); color: var(--text-2); font-size: 16px; line-height: 1.55; }
+.cz-cams b { color: var(--ink); }
+.cz-measured-head + .cz-timeline { margin-top: 64px; }
+
+/* 06 · The show: a broadcast frame, not a card */
 .cz-screen { position: relative; margin: 72px 0 0; padding: 64px 28px 28px; }
 .cz-screen-c { position: absolute; width: 34px; height: 34px; border: 2px solid var(--cz-maroon); }
 .cz-screen-c.tl { top: 0; left: 0; border-right: 0; border-bottom: 0; }
@@ -416,26 +392,15 @@
 .cz-screen-board li { display: flex; gap: 10px; padding: 4px 0; }
 .cz-screen-board b { color: var(--cz-maroon); width: 12px; }
 .cz-screen-board em { margin-left: auto; font-style: normal; font-weight: 700; }
-.cz-cams { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
-.cz-cams li { padding-top: 18px; border-top: 1px solid var(--line-2); color: var(--text-2); font-size: 16px; line-height: 1.55; }
-.cz-cams b { color: var(--ink); }
 
-/* 08 · House rules */
+/* 07 · What to present */
 .cz-rules { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line-2); }
 .cz-rules li { padding: 32px 28px 0 0; }
 .cz-rules li + li { padding-left: 28px; border-left: 1px solid var(--line-2); }
 .cz-rule-n { display: block; font-family: var(--cz-serif); font-weight: 700; font-size: 80px; line-height: 0.85; color: transparent; -webkit-text-stroke: 1.5px var(--cz-maroon); }
 .cz-rules h3 { margin-top: 24px; font-size: 24px; color: var(--ink); }
 .cz-rules p { margin-top: 10px; color: var(--text-2); font-size: 15.5px; line-height: 1.6; }
-
-/* 09 · Leo */
-.cz-leo-inner { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 72px; align-items: center; }
-.cz-leo-badge { width: 220px; height: 220px; border-radius: 50%; display: grid; place-items: center; border: 2px solid var(--cz-maroon); position: relative; }
-.cz-leo-badge::before { content: ""; position: absolute; inset: -16px; border-radius: 50%; border: 1.5px dashed rgba(94, 7, 67, 0.35); animation: czSpin 30s linear infinite; }
-.cz-leo-badge span { font-family: var(--cz-serif); font-weight: 700; font-size: 72px; color: var(--cz-maroon); letter-spacing: -0.03em; }
-@keyframes czSpin { to { transform: rotate(360deg); } }
-
-/* 10 · Register */
+/* 08 · Register */
 .cz-register { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; align-items: start; }
 .cz-vacancy-title { margin-top: 20px; font-size: clamp(56px, 7vw, 108px); line-height: 0.95; letter-spacing: -0.04em; color: var(--ink); }
 .cz-vacancy dl { margin: 40px 0 0; border-top: 1px solid var(--line-2); }
@@ -472,12 +437,20 @@
 .cz-size-opt:has(input:focus-visible) { box-shadow: 0 0 0 4px rgba(94, 7, 67, 0.15); border-color: var(--cz-maroon); }
 .cz-size-opt.is-on { background: var(--cz-maroon); border-color: var(--cz-maroon); color: #fff; }
 .cz-size.has-error .cz-size-opt { border-color: rgba(94, 7, 67, 0.5); }
+.cz-joining { margin-top: 28px; }
+.cz-size-row--2 { grid-template-columns: 1fr 1fr; }
+.cz-size-row--2 .cz-size-opt { font-size: 15px; }
+.cz-joining + .cz-form-grid { margin-top: 18px; }
+.cz-field--wide { grid-column: 1 / -1; }
 
 /* Team size ⇄ teammates. Both panels live in one full-width slot; the open
    one gets 1fr of height and the other folds to 0, so the swap is a single
    smooth slide rather than a jump. Padding plus a matching negative margin
    keeps focus rings from being clipped by the overflow. */
-.cz-team { grid-column: 1 / -1; display: grid; }
+.cz-team { grid-column: 1 / -1; }
+.cz-team-slots { display: grid; }
+/* Folded away for individuals: also take back the grid gap above it. */
+.cz-team:not(.is-open) { margin-top: -18px; transition: grid-template-rows 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease, margin-top 0.42s ease; }
 .cz-fold {
   display: grid; grid-template-rows: 0fr; opacity: 0;
   transition: grid-template-rows 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
@@ -512,12 +485,32 @@
 .cz-member-add:hover, .cz-member-add:focus-visible { outline: none; border-color: var(--cz-maroon); color: var(--cz-maroon); }
 @keyframes cz-member-in { from { opacity: 0; transform: translateY(-8px) scale(0.98); } }
 @keyframes cz-member-out { to { opacity: 0; transform: scale(0.96); } }
+
+.cz-check {
+  grid-column: 1 / -1; position: relative; display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px 16px; border: 1.5px solid var(--line); border-radius: 12px; cursor: pointer;
+  font-size: 14.5px; font-weight: 600; color: var(--ink-2); line-height: 1.4;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.cz-check:hover { border-color: var(--line-2); }
+.cz-check input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.cz-check em { display: block; margin-top: 3px; font-style: normal; font-weight: 400; font-size: 13px; color: var(--text-3); }
+.cz-check-box {
+  flex-shrink: 0; display: grid; place-items: center; width: 22px; height: 22px; margin-top: 1px;
+  border: 1.5px solid var(--line-2); border-radius: 6px; color: #fff; background: #fff;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.cz-check-box svg { opacity: 0; transform: scale(0.6); transition: opacity 0.15s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); }
+.cz-check:has(input:checked) { border-color: var(--cz-maroon); background: rgba(94, 7, 67, 0.04); }
+.cz-check input:checked + .cz-check-box { background: var(--cz-maroon); border-color: var(--cz-maroon); }
+.cz-check input:checked + .cz-check-box svg { opacity: 1; transform: none; }
+.cz-check:has(input:focus-visible) { box-shadow: 0 0 0 4px rgba(94, 7, 67, 0.15); border-color: var(--cz-maroon); }
 .cz-form-error { margin-top: 20px; background: var(--surface); border: 1px solid var(--cz-maroon); color: var(--cz-maroon); padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.45; }
 .cz-form .cz-btn--block { margin-top: 28px; }
 .cz-form-fine { margin-top: 14px; font-size: 12.5px; line-height: 1.5; color: var(--text-3); text-align: center; }
 .cz-form-fine a { color: var(--cz-maroon); text-decoration: underline; }
 
-/* 11 · FAQ */
+/* 09 · FAQ */
 .cz-faq { border-top: 1px solid var(--line-2); }
 .cz-faq details { border-bottom: 1px solid var(--line-2); }
 .cz-faq summary {
@@ -572,12 +565,10 @@
 .cz-badge-card dd { margin: 0; font-weight: 600; text-align: right; color: var(--ink); }
 .cz-verdict { display: inline-block; padding: 4px 10px; border-radius: 100px; font-size: 12px; font-weight: 700; }
 .cz-verdict.is-pending { background: var(--surface-2); color: var(--cz-maroon); }
-.cz-badge-lives { display: flex; align-items: center; gap: 6px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
-.cz-badge-lives span { width: 14px; height: 14px; border-radius: 50%; background: var(--cz-maroon); }
-.cz-badge-lives em { font-style: normal; margin-left: 8px; color: var(--text-3); font-size: 11px; }
 .cz-timeline { list-style: none; padding: 0; margin: 56px 0 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); position: relative; }
 .cz-timeline::before { content: ""; position: absolute; left: 0; right: 0; top: 19px; height: 2px; background: repeating-linear-gradient(90deg, var(--line-2) 0 8px, transparent 8px 14px); }
 .cz-timeline li { position: relative; padding-right: 24px; }
+.cz-timeline--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 /* No badge: the number or tick sits on the line. The page colour behind it
    only breaks the dashed line so the glyph stays legible. */
 .cz-timeline-dot { position: relative; z-index: 1; display: grid; place-items: center; width: 40px; height: 40px; font-family: var(--cz-mono); font-size: 13px; font-weight: 700; color: var(--text-3); background: var(--surface); }
@@ -620,21 +611,18 @@
   .cz-measured-head { grid-template-columns: 1fr; gap: 0; }
   .cz-measured-head .cz-lede { margin-top: 20px; }
   .cz-section--tight { padding: 52px 0; }
-  .cz-dossier li { padding: 10px 0; }
-  .cz-dossier-stamp { margin-top: 20px; }
   .cz-places li { grid-template-columns: 32px minmax(0, 1fr); row-gap: 2px; padding: 9px 0; }
   .cz-places-tease { grid-column: 2; font-size: 14px; }
+  .cz-dossier li { padding: 10px 0; }
+  .cz-dossier-stamp { margin-top: 20px; }
   .cz-dossier-line { font-size: 16px; }
   .cz-rings { left: 50%; top: 72%; }
   .cz-screen { padding: 56px 12px 12px; }
   .cz-screen-board { position: static; margin-top: 16px; }
   .cz-cams { grid-template-columns: 1fr; gap: 0; }
   .cz-cams li { padding: 16px 0; }
-  .cz-leo-inner { grid-template-columns: 1fr; gap: 40px; justify-items: start; }
-  .cz-leo-badge { width: 140px; height: 140px; margin-left: 16px; }
-  .cz-leo-badge span { font-size: 46px; }
   .cz-closer .cz-wrap { flex-direction: column; align-items: flex-start; gap: 16px; }
-  .cz-timeline { grid-template-columns: 1fr; gap: 28px; }
+  .cz-timeline, .cz-timeline--4 { grid-template-columns: 1fr; gap: 28px; }
   .cz-timeline::before { left: 19px; right: auto; top: 0; bottom: 0; width: 2px; height: auto; background: repeating-linear-gradient(180deg, var(--line-2) 0 8px, transparent 8px 14px); }
   .cz-timeline li { display: grid; grid-template-columns: 40px 1fr; column-gap: 18px; padding: 0; }
   .cz-timeline-dot { grid-row: span 2; }
@@ -675,7 +663,4 @@
   .cz-ticker-track { animation: none; }
   .cz-ghost-trail { stroke-dashoffset: 0; }
   .cz-rings circle { animation: none; }
-  /* No pinned scroll scene: the lamps just sit there, all lit. */
-  .cz-lifelines-sec { height: auto; padding: 120px 0; }
-  .cz-lifelines-pin { position: static; height: auto; }
 }
