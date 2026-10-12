@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Icon from "../components/Icon";
-import ColleagueZeroCampus from "../components/ColleagueZeroCampus";
+import ColleagueZeroCrew, { Bot, CrewDefs } from "../components/ColleagueZeroCrew";
 import { getLeadSource, hackathonConfigured, sendHackathonRegistrationToSheet } from "../sheets";
 import "./ColleagueZero.css";
 
@@ -105,7 +105,7 @@ function HeroRings() {
   return (
     <div className="cz-hero-bg" aria-hidden="true">
       <svg className="cz-rings" viewBox="0 0 1600 1600">
-        {Array.from({ length: 13 }, (_, k) => (
+        {Array.from({ length: 8 }, (_, k) => (
           <circle key={k} cx="800" cy="800" r={60 * (k + 1)} style={{ "--k": k }} />
         ))}
       </svg>
@@ -260,36 +260,94 @@ function Manifesto() {
   );
 }
 
-// The overview's own contrast: what this hackathon is not, then what it is.
-const CONTRAST = [
-  { name: "A chatbot", tease: "Waits for a question and answers it. Not what we're asking for." },
-  { name: "An automation", tease: "Follows a fixed script, every time. Not what we're asking for either." },
-  { name: "A digital colleague", tease: "Takes a goal, plans the steps, uses tools, checks its work and fixes its own mistakes." },
+/* The challenge: what this hackathon is not, then what it is, drawn with
+   the hero's robots. Each little scene moves the way that kind of system
+   behaves; the wording is the brief's. */
+function ChallengeScene({ kind }) {
+  const ids = `czx-${kind}`;
+  return (
+    <svg viewBox="0 0 240 170" className={"cz-x-art is-" + kind} aria-hidden="true">
+      <CrewDefs ids={ids} />
+      <ellipse cx="120" cy="158" rx="70" ry="8" className="cz-x-floor" />
+      {kind === "chatbot" && (
+        <>
+          <g className="cz-x-bubble">
+            <rect x="22" y="14" width="70" height="34" rx="17" />
+            <text x="57" y="37">?</text>
+          </g>
+          <g className="cz-x-reply">
+            <rect x="132" y="44" width="74" height="30" rx="15" />
+            <circle cx="155" cy="59" r="3" /><circle cx="169" cy="59" r="3" /><circle cx="183" cy="59" r="3" />
+          </g>
+        </>
+      )}
+      {kind === "automation" && (
+        <>
+          {[40, 102, 164].map((x, i) => (
+            <g key={x} className="cz-x-step">
+              <rect x={x} y="22" width="36" height="36" rx="9" />
+              <text x={x + 18} y="45">{i + 1}</text>
+            </g>
+          ))}
+          <path d="M76 40h26M138 40h26" className="cz-x-link" />
+          <path d="M200 50 C 214 80, 26 80, 40 50" className="cz-x-loop" />
+          <circle r="5" className="cz-x-run">
+            <animateMotion dur="3s" repeatCount="indefinite" path="M58 40 H182 C 214 80, 26 80, 58 40" />
+          </circle>
+        </>
+      )}
+      {kind === "colleague" && (
+        <>
+          <circle cx="120" cy="46" r="34" className="cz-x-ring" />
+          {[0, 90, 180, 270].map((a) => {
+            const r = ((a - 90) * Math.PI) / 180;
+            return <circle key={a} cx={120 + 34 * Math.cos(r)} cy={46 + 34 * Math.sin(r)} r="5" className="cz-x-node" />;
+          })}
+          <circle r="6" className="cz-x-orb">
+            <animateMotion dur="4s" repeatCount="indefinite" path="M120 12 A34 34 0 1 1 119.99 12" />
+          </circle>
+          <path d="m110 47 7 7 13-14" className="cz-x-check" />
+        </>
+      )}
+      <Bot X={120} Y={160} on={kind === "colleague"} ids={ids} />
+    </svg>
+  );
+}
+
+const CHALLENGE = [
+  { kind: "chatbot", t: "A chatbot", v: "Waits for a question and answers it.", ok: false },
+  { kind: "automation", t: "A basic automation", v: "Follows a fixed script.", ok: false },
+  { kind: "colleague", t: "A digital colleague", v: "Plans the work, uses tools, checks its own output and fixes what is wrong.", ok: true },
 ];
 
 function Challenge() {
   return (
     <section className="cz-section cz-section--tight" id="the-main">
-      <div className="cz-wrap cz-split">
-        <div className="cz-split-aside">
-          <Eyebrow n="02">The challenge</Eyebrow>
-          <h2 className="cz-h2">Build a digital colleague.</h2>
-          <p className="cz-lede">
-            Give it a goal and step back. Your colleague plans the work, uses tools to do it, checks
-            its own output, and fixes what's wrong, without a person stepping in at every stage. One
-            rule: it has to solve a real problem in EdTech.
-          </p>
-          <p className="cz-note cz-mono">Every project solves a real problem in EdTech</p>
+      <div className="cz-wrap">
+        <div className="cz-measured-head">
+          <div>
+            <Eyebrow n="02">The challenge</Eyebrow>
+            <h2 className="cz-h2">Build a digital colleague.</h2>
+          </div>
+          <div>
+            <p className="cz-lede">This is not a chatbot hackathon.</p>
+            <p className="cz-note cz-mono">Every project must solve a real problem in EdTech</p>
+          </div>
         </div>
-        <ol className="cz-places" aria-label="A chatbot, an automation and a digital colleague">
-          {CONTRAST.map((p, i) => (
-            <li key={p.name}>
-              <span className="cz-places-n cz-mono">{String(i + 1).padStart(2, "0")}</span>
-              <span className="cz-places-name">{p.name}</span>
-              <span className="cz-places-tease">{p.tease}</span>
+        <ul className="cz-x">
+          {CHALLENGE.map((x) => (
+            <li key={x.kind} className={x.ok ? "is-ok" : ""}>
+              <ChallengeScene kind={x.kind} />
+              <div className="cz-x-text">
+                <span className={"cz-x-mark" + (x.ok ? " is-ok" : "")} aria-hidden="true">{x.ok ? "✓" : "✕"}</span>
+                <div>
+                  <h3>{x.t}</h3>
+                  <p>{x.v}</p>
+                </div>
+              </div>
             </li>
           ))}
-        </ol>
+        </ul>
       </div>
     </section>
   );
@@ -1373,37 +1431,54 @@ function AgentBuddy() {
   }, []);
   return (
     <span className="cz-buddy" ref={ref} aria-hidden="true">
-      <svg viewBox="0 0 64 74">
-        <ellipse className="cz-buddy-shadow" cx="32" cy="71" rx="15" ry="2.4" />
+      <svg viewBox="0 0 64 70">
+        <defs>
+          {/* Soft top lighting on every surface, all within the navy family. */}
+          <linearGradient id="czb-head" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#2a3c6e" />
+            <stop offset="1" stopColor="#0a1733" />
+          </linearGradient>
+          <linearGradient id="czb-visor" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#24366a" />
+            <stop offset="1" stopColor="#0c1838" />
+          </linearGradient>
+          <linearGradient id="czb-body" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#33467c" />
+            <stop offset="1" stopColor="#1c2b55" />
+          </linearGradient>
+        </defs>
+        <ellipse className="cz-buddy-shadow" cx="32" cy="66" rx="12" ry="2" />
         <g className="cz-buddy-bob">
-          {/* Left arm, resting. */}
+          {/* Left arm, resting by the side. */}
           <g className="cz-buddy-arm-l">
-            <rect x="11" y="48" width="7" height="15" rx="3.5" />
-            <circle cx="14.5" cy="63.5" r="3.6" className="cz-buddy-hand" />
+            <rect x="15.5" y="38" width="4.5" height="15" rx="2.25" />
+            <circle className="cz-buddy-hand" cx="17.75" cy="54" r="2.6" />
           </g>
-          {/* Body: a hoodie with a name badge. */}
-          <rect className="cz-buddy-body" x="17" y="46" width="30" height="21" rx="10" />
-          <path className="cz-buddy-collar" d="M27 46.5 L32 52 L37 46.5" />
-          <rect className="cz-buddy-badge" x="36" y="54" width="7" height="8.5" rx="1.6" />
-          <rect className="cz-buddy-badge-line" x="37.6" y="58.4" width="3.8" height="1.2" rx="0.6" />
+          {/* Torso: tapered, with a seam and a softly glowing core. */}
+          <rect className="cz-buddy-neck" x="29" y="32.5" width="6" height="4" rx="1.5" />
+          <path className="cz-buddy-body" d="M20 40 Q20 36 24 36 H40 Q44 36 44 40 L42.4 56 Q42 60 38 60 H26 Q22 60 21.6 56 Z" />
+          <path className="cz-buddy-seam" d="M24.5 39 H39.5" />
+          <circle className="cz-buddy-core" cx="32" cy="47" r="2.4" />
           {/* Right arm: hangs down at rest, swings up from the shoulder to wave. */}
           <g className="cz-buddy-arm-r">
-            <rect x="46" y="33" width="7" height="16" rx="3.5" />
-            <circle cx="49.5" cy="32.5" r="3.9" className="cz-buddy-hand" />
+            <rect x="44" y="24" width="4.5" height="15" rx="2.25" />
+            <circle className="cz-buddy-hand" cx="46.25" cy="23.5" r="2.6" />
           </g>
           <g className="cz-buddy-head">
-            <line className="cz-buddy-antenna" x1="32" y1="7" x2="32" y2="14" />
-            <circle className="cz-buddy-bulb" cx="32" cy="5.5" r="3.4" />
-            <rect className="cz-buddy-skull" x="12" y="13" width="40" height="32" rx="12" />
-            <rect className="cz-buddy-visor" x="16" y="18.5" width="32" height="20" rx="8.5" />
+            <line className="cz-buddy-antenna" x1="32" y1="6.5" x2="32" y2="12.5" />
+            <circle className="cz-buddy-bulb" cx="32" cy="5" r="2.6" />
+            <rect className="cz-buddy-ear" x="16.5" y="18.5" width="3" height="8" rx="1.5" />
+            <rect className="cz-buddy-ear" x="44.5" y="18.5" width="3" height="8" rx="1.5" />
+            <rect className="cz-buddy-skull" x="19" y="12" width="26" height="21" rx="9" />
+            <path className="cz-buddy-rim" d="M24 13.4 H40" />
+            <rect className="cz-buddy-visor" x="21.8" y="16" width="20.4" height="12.5" rx="5.6" />
+            <path className="cz-buddy-gloss" d="M24.2 18.4 Q26 17.1 29 17.1" />
             <g className="cz-buddy-eyes">
-              <rect className="cz-buddy-eye" x="23" y="23.5" width="5" height="8" rx="2.5" />
-              <rect className="cz-buddy-eye" x="36" y="23.5" width="5" height="8" rx="2.5" />
-              <path className="cz-buddy-happy" d="M22.8 29 Q25.5 24.6 28.2 29 M35.8 29 Q38.5 24.6 41.2 29" />
+              <rect className="cz-buddy-eye" x="26" y="19.6" width="3.2" height="5" rx="1.6" />
+              <rect className="cz-buddy-eye" x="34.8" y="19.6" width="3.2" height="5" rx="1.6" />
+              <path className="cz-buddy-happy" d="M25.7 23.4 Q27.6 20.6 29.5 23.4 M34.5 23.4 Q36.4 20.6 38.3 23.4" />
             </g>
-            <path className="cz-buddy-smile" d="M28.5 33.6 Q32 36.4 35.5 33.6" />
-            <circle className="cz-buddy-cheek" cx="20.2" cy="34" r="1.9" />
-            <circle className="cz-buddy-cheek" cx="43.8" cy="34" r="1.9" />
+            <path className="cz-buddy-smile" d="M30.2 26.2 Q32 27.5 33.8 26.2" />
           </g>
         </g>
       </svg>
@@ -1474,7 +1549,8 @@ const ColleagueZeroPage = ({ navigate }) => {
       <CzHeader navigate={navigate} onRegister={goRegister} />
 
       <section className="cz-hero">
-        <HeroRings />
+        {/* Just the soft bloom here; no rings behind the figure. */}
+        <div className="cz-hero-bg" aria-hidden="true" />
         <div className="cz-wrap cz-hero-grid">
           <div className="cz-hero-copy">
             <p className="cz-kicker cz-mono">
@@ -1502,7 +1578,7 @@ const ColleagueZeroPage = ({ navigate }) => {
             </dl>
           </div>
           <div className="cz-hero-stage">
-            <ColleagueZeroCampus />
+            <ColleagueZeroCrew />
           </div>
         </div>
       </section>

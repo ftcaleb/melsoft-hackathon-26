@@ -246,6 +246,119 @@
 .cz-flight { animation: czFly 0.9s var(--cz-ease) forwards; }
 @keyframes czFly { 0% { transform: translate(0, 0); opacity: 1; } 45% { transform: translate(calc(var(--fx) * 0.5), calc(var(--fy) * 0.5 - 40px)); } 100% { transform: translate(var(--fx), var(--fy)); opacity: 0; } }
 
+/* ── Hero figure: the crew (ColleagueZeroCrew.jsx) ── */
+.cz-crew { position: relative; width: 100%; max-width: 640px; margin: 0 auto; }
+.cz-crew-svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 30px 40px rgba(10, 23, 51, 0.1)); }
+.cz-crew-floor { fill: rgba(10, 23, 51, 0.08); filter: blur(18px); }
+/* Boxes: each face is stroked in its own colour with round joins, which
+   rounds the corners (wider on the platform, finer on the small boxes). */
+.cz-crew-t, .cz-crew-l, .cz-crew-r { stroke-linejoin: round; stroke-width: var(--rad, 3px); }
+.cz-crew-slab { --rad: 9px; }
+.cz-crew-ped, .cz-crew-tray { --rad: 4px; }
+.cz-crew-slab .cz-crew-t { fill: url(#czc-top); stroke: url(#czc-top); }
+.cz-crew-slab .cz-crew-l { fill: #d9deea; stroke: #d9deea; }
+.cz-crew-slab .cz-crew-r { fill: #e8ebf2; stroke: #e8ebf2; }
+.cz-crew-grid line { stroke: rgba(10, 23, 51, 0.045); stroke-width: 1; }
+.cz-crew-ped .cz-crew-t, .cz-crew-tray .cz-crew-t { fill: #fff; stroke: #fff; }
+.cz-crew-ped .cz-crew-l, .cz-crew-tray .cz-crew-l { fill: #d9deea; stroke: #d9deea; }
+.cz-crew-ped .cz-crew-r, .cz-crew-tray .cz-crew-r { fill: #eceff5; stroke: #eceff5; }
+/* Edges: a white highlight along the top front edges and the front
+   corner, a faint darker line at the base. */
+.cz-crew-hi { fill: none; stroke: rgba(255, 255, 255, 0.95); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+.cz-crew-base { fill: none; stroke: rgba(10, 23, 51, 0.1); stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
+/* The outline: a hairline at rest, maroon on the active station. */
+.cz-crew-outline { fill: none; stroke: rgba(10, 23, 51, 0.08); stroke-width: 1; stroke-linejoin: round; transition: stroke 0.4s ease, stroke-width 0.4s ease; }
+.cz-crew-slab .cz-crew-outline { stroke: none; }
+.cz-crew-station.is-on .cz-crew-outline { stroke: var(--cz-maroon); stroke-width: 1.6; }
+.cz-crew-shade { fill: rgba(10, 23, 51, 0.07); filter: blur(4px); transition: fill 0.4s ease; }
+.cz-crew-station.is-on .cz-crew-shade { fill: rgba(94, 7, 67, 0.2); }
+.cz-crew-sheet { fill: #fff; stroke: rgba(10, 23, 51, 0.16); stroke-width: 0.8; }
+/* Path: a soft groove, then maroon behind the work. */
+.cz-crew-groove { stroke: #e3e7f0; stroke-width: 6; stroke-linecap: round; }
+.cz-crew-fill { stroke: var(--cz-maroon); stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 0.9s cubic-bezier(0.65, 0, 0.35, 1); }
+.cz-crew-seg.is-done .cz-crew-fill { stroke-dashoffset: 0; }
+.cz-crew-label {
+  font-family: var(--cz-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+  text-anchor: middle; fill: #8a93a8;
+  paint-order: stroke; stroke: #fff; stroke-width: 6px; stroke-linejoin: round;
+  transition: fill 0.3s ease;
+}
+.cz-crew-station.is-on .cz-crew-label { fill: var(--cz-maroon); }
+/* Robots: still unless they hold the work. */
+.cz-crew-botshadow { fill: rgba(10, 23, 51, 0.16); }
+.cz-crew-lift { transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+.cz-crew-bot.is-on .cz-crew-lift { transform: translateY(-5px); }
+.cz-crew-limb { fill: #2a3c6e; }
+.cz-crew-hand { fill: #1c2b55; }
+.cz-crew-core { fill: #b9c3de; opacity: 0.5; transition: opacity 0.3s ease; }
+.cz-crew-bot.is-on .cz-crew-core { opacity: 1; filter: drop-shadow(0 0 3px rgba(185, 195, 222, 0.9)); }
+.cz-crew-antenna { stroke: #1c2b55; stroke-width: 1.4; stroke-linecap: round; }
+.cz-crew-bulb { fill: #5a6c9e; transition: fill 0.3s ease; }
+.cz-crew-bot.is-on .cz-crew-bulb { fill: var(--cz-maroon); filter: drop-shadow(0 0 3px rgba(122, 18, 89, 0.7)); }
+.cz-crew-gloss { fill: none; stroke: rgba(238, 241, 248, 0.35); stroke-width: 1; stroke-linecap: round; }
+.cz-crew-eye { fill: #b9c3de; transition: fill 0.3s ease; }
+.cz-crew-bot.is-on .cz-crew-eye { fill: #eef1f8; filter: drop-shadow(0 0 1.6px rgba(238, 241, 248, 0.9)); }
+/* The document, gliding between stations. */
+.cz-crew-doc { transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1); }
+.cz-crew-doc.is-reset { transition: none; }
+.cz-crew-paper { fill: #fff; stroke: rgba(10, 23, 51, 0.2); stroke-width: 1; stroke-linejoin: round; filter: drop-shadow(0 8px 10px rgba(10, 23, 51, 0.18)); }
+.cz-crew-fold { fill: #eef1f8; stroke: rgba(10, 23, 51, 0.2); stroke-width: 1; stroke-linejoin: round; }
+.cz-crew-lines { stroke: #b9c3de; stroke-width: 1.6; stroke-linecap: round; }
+.cz-crew-badge { opacity: 0; transform: scale(0.4); transform-box: fill-box; transform-origin: center; transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.cz-crew-badge.is-flag, .cz-crew-badge.is-fixed { opacity: 1; transform: none; }
+.cz-crew-badge circle { fill: var(--cz-maroon); }
+.cz-crew-badge.is-fixed circle { fill: var(--ink); }
+.cz-crew-badge text { font-size: 10px; font-weight: 800; fill: #fff; text-anchor: middle; }
+
+/* ── 02 The challenge: three little scenes (ChallengeScene) ── */
+.cz-x { list-style: none; margin: 56px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line-2); }
+.cz-x > li { position: relative; padding: 32px 28px 8px; }
+.cz-x > li + li { border-left: 1px solid var(--line-2); }
+/* The one that counts: a maroon rule on top and a soft tint fading down. */
+.cz-x > li.is-ok { background: linear-gradient(180deg, rgba(94, 7, 67, 0.06), transparent 75%); }
+.cz-x > li.is-ok::before { content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 2px; background: var(--cz-maroon); }
+.cz-x-art { display: block; width: 100%; max-width: 260px; height: auto; margin: 0 auto; overflow: visible; }
+.cz-x > li:not(.is-ok) .cz-x-art { filter: saturate(0.4); opacity: 0.75; }
+.cz-x-floor { fill: rgba(10, 23, 51, 0.07); filter: blur(3px); }
+.cz-x-text { display: flex; gap: 14px; align-items: flex-start; margin-top: 22px; }
+.cz-x-mark {
+  flex-shrink: 0; display: grid; place-items: center; width: 28px; height: 28px; margin-top: 1px; border-radius: 50%;
+  font-size: 13px; font-weight: 800; color: var(--text-3); border: 1.5px solid var(--line-2);
+}
+.cz-x-mark.is-ok { color: #fff; background: var(--cz-maroon); border-color: var(--cz-maroon); }
+.cz-x h3 { font-size: 21px; color: var(--ink); }
+.cz-x > li:not(.is-ok) h3 { color: var(--text-2); }
+.cz-x p { margin-top: 6px; font-size: 15px; line-height: 1.55; color: var(--text-2); }
+/* Chatbot: a question, then an answer typing. */
+.cz-x-bubble rect { fill: #fff; stroke: var(--line-2); stroke-width: 1.5; }
+.cz-x-bubble text, .cz-x-step text { font-size: 17px; font-weight: 800; text-anchor: middle; fill: var(--text-3); }
+.cz-x-reply rect { fill: #e3e7f0; }
+.cz-x-reply circle { fill: var(--text-3); animation: czXDot 1.2s ease-in-out infinite; }
+.cz-x-reply circle:nth-of-type(2) { animation-delay: 0.15s; }
+.cz-x-reply circle:nth-of-type(3) { animation-delay: 0.3s; }
+@keyframes czXDot { 0%, 60%, 100% { opacity: 0.3; } 30% { opacity: 1; } }
+/* Automation: the same three steps, round and round. */
+.cz-x-step rect { fill: #fff; stroke: var(--line-2); stroke-width: 1.5; }
+.cz-x-link { stroke: var(--line-2); stroke-width: 1.5; stroke-dasharray: 3 4; }
+.cz-x-loop { fill: none; stroke: var(--line-2); stroke-width: 1.5; stroke-dasharray: 3 4; }
+.cz-x-run { fill: var(--text-3); }
+/* Colleague: a goal worked round a loop, ending in a check. */
+.cz-x-ring { fill: rgba(94, 7, 67, 0.04); stroke: rgba(94, 7, 67, 0.3); stroke-width: 1.5; }
+.cz-x-node { fill: #fff; stroke: var(--ink); stroke-width: 2; }
+.cz-x-orb { fill: var(--cz-maroon); filter: drop-shadow(0 0 5px rgba(94, 7, 67, 0.55)); }
+.cz-x-check { fill: none; stroke: var(--cz-maroon); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 860px) {
+  .cz-x { grid-template-columns: 1fr; }
+  .cz-x > li { padding: 28px 0 20px; }
+  .cz-x > li + li { border-left: 0; border-top: 1px solid var(--line-2); }
+  .cz-x > li.is-ok { padding: 28px 16px 20px; }
+  .cz-x-art { max-width: 220px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cz-x-reply circle { animation: none; opacity: 0.6; }
+  .cz-x-run, .cz-x-orb { display: none; }
+}
+
 /* ── Ticker: one row, one speed, no seam ── */
 .cz-ticker {
   position: relative; overflow: hidden;
@@ -763,7 +876,12 @@
   pointer-events: none;
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
 }
-.cz-think.is-shown { opacity: 1; transform: none; pointer-events: auto; }
+.cz-think.is-shown { opacity: 1; transform: none; }
+/* Only the robot catches the pointer, so the empty space where the hidden
+   bubble sits doesn't. Hovering the robot opens the bubble; the bubble then
+   takes the pointer too, so you can move up into it and click. */
+.cz-think.is-shown .cz-buddy { pointer-events: auto; cursor: pointer; }
+.cz-think.is-shown:hover .cz-think-bubble, .cz-think.is-shown:focus-visible .cz-think-bubble { pointer-events: auto; }
 /* Bubble and agent drift together, a little out of step with each other. */
 .cz-think-float { display: flex; flex-direction: column; align-items: flex-end; gap: 24px; animation: czThinkBob 6s ease-in-out infinite; }
 @keyframes czThinkBob { 50% { transform: translateY(-6px); } }
@@ -772,6 +890,19 @@
   width: max-content; padding: 11px 15px 10px; border-radius: 14px 14px 4px 14px;
   background: var(--ink); color: #fff;
   box-shadow: 0 24px 50px -20px rgba(10, 23, 51, 0.65);
+  /* Hidden until hover. It lingers a beat after the pointer leaves so
+     there's time to cross the gap from the robot into it. */
+  opacity: 0; transform: translateY(10px) scale(0.92); transform-origin: calc(100% - 34px) 100%;
+  pointer-events: none;
+  transition: opacity 0.25s ease 0.35s, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.35s;
+}
+.cz-think:hover .cz-think-bubble, .cz-think:focus-visible .cz-think-bubble {
+  opacity: 1; transform: none; transition-delay: 0s;
+}
+/* Touch screens have no hover, so there the bubble simply stays open. */
+@media (hover: none) {
+  .cz-think-bubble { opacity: 1; transform: none; }
+  .cz-think.is-shown, .cz-think.is-shown .cz-think-bubble { pointer-events: auto; }
 }
 /* The tail: two shrinking dots trailing down to the agent, comic-style. */
 .cz-think-bubble::before, .cz-think-bubble::after { content: ""; position: absolute; border-radius: 50%; background: var(--ink); }
@@ -795,7 +926,7 @@
 .cz-think:focus-visible .cz-think-bubble { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--cz-maroon); }
 /* The little colleague (AgentBuddy). Arms and head turn about their own
    joints, so each part sets transform-box and an origin. */
-.cz-buddy { position: relative; display: block; width: 58px; height: 67px; margin-right: 6px; }
+.cz-buddy { position: relative; display: block; width: 54px; height: 59px; margin-right: 8px; }
 /* A soft navy halo behind the character, breathing slowly; it brightens
    while it waves. */
 .cz-buddy::before {
@@ -813,45 +944,50 @@
 .cz-buddy-bob { animation: czBuddyBob 6s ease-in-out infinite; }
 @keyframes czBuddyBob { 50% { transform: translateY(-3px); } }
 @keyframes czBuddyShadow { 50% { transform: scaleX(0.82); opacity: 0.7; } }
-.cz-buddy-body, .cz-buddy-arm-l rect, .cz-buddy-arm-r rect { fill: var(--nv-600); }
-.cz-buddy-collar { fill: none; stroke: var(--nv-200); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.cz-buddy-badge { fill: var(--nv-50); }
-.cz-buddy-badge-line { fill: var(--nv-400); }
-.cz-buddy-hand { fill: var(--nv-900); }
-.cz-buddy-arm-l { transform-box: view-box; transform-origin: 14.5px 49px; transform: rotate(8deg); }
+.cz-buddy-body { fill: url(#czb-body); }
+.cz-buddy-arm-l rect, .cz-buddy-arm-r rect { fill: var(--nv-600); }
+.cz-buddy-hand { fill: var(--nv-700); }
+.cz-buddy-neck { fill: var(--nv-700); }
+.cz-buddy-seam { fill: none; stroke: rgba(238, 241, 248, 0.16); stroke-width: 0.8; stroke-linecap: round; }
+/* The chest core: a small light that breathes with the halo. */
+.cz-buddy-core { fill: var(--nv-200); filter: drop-shadow(0 0 2.5px rgba(185, 195, 222, 0.9)); animation: czBuddyCore 4.5s ease-in-out infinite; }
+@keyframes czBuddyCore { 50% { opacity: 0.55; } }
+.cz-buddy-arm-l { transform-box: view-box; transform-origin: 17.75px 39px; transform: rotate(9deg); }
 /* At rest the raised arm is turned down by the side; waving swings it up
    and back and forth with a little overshoot, then lowers it again. */
-.cz-buddy-arm-r { transform-box: view-box; transform-origin: 49.5px 48px; transform: rotate(158deg); transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+.cz-buddy-arm-r { transform-box: view-box; transform-origin: 46.25px 39px; transform: rotate(166deg); transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
 .cz-buddy.is-waving .cz-buddy-arm-r { animation: czBuddyWave 1.45s cubic-bezier(0.37, 0, 0.3, 1); }
 @keyframes czBuddyWave {
-  0% { transform: rotate(158deg); }
-  16% { transform: rotate(-14deg); }
-  30% { transform: rotate(22deg); }
-  44% { transform: rotate(-16deg); }
-  58% { transform: rotate(20deg); }
-  72% { transform: rotate(-8deg); }
-  100% { transform: rotate(158deg); }
+  0% { transform: rotate(166deg); }
+  16% { transform: rotate(-12deg); }
+  30% { transform: rotate(20deg); }
+  44% { transform: rotate(-14deg); }
+  58% { transform: rotate(18deg); }
+  72% { transform: rotate(-6deg); }
+  100% { transform: rotate(166deg); }
 }
-.cz-buddy-head { transform-box: view-box; transform-origin: 32px 45px; transform: rotate(var(--tilt, 0deg)); transition: transform 0.25s ease-out; }
-.cz-buddy-antenna { stroke: var(--nv-900); stroke-width: 2; stroke-linecap: round; }
+.cz-buddy-head { transform-box: view-box; transform-origin: 32px 34px; transform: rotate(var(--tilt, 0deg)); transition: transform 0.25s ease-out; }
+.cz-buddy-antenna { stroke: var(--nv-700); stroke-width: 1.4; stroke-linecap: round; }
 .cz-buddy-bulb {
   fill: var(--cz-maroon); transform-box: fill-box; transform-origin: center;
   filter: drop-shadow(0 0 2px rgba(122, 18, 89, 0.55));
   animation: czBuddyBulb 1.6s ease-in-out infinite;
 }
 @keyframes czBuddyBulb { 50% { fill: var(--cz-maroon-2); transform: scale(1.15); filter: drop-shadow(0 0 5px rgba(122, 18, 89, 0.85)); } }
-.cz-buddy-skull { fill: var(--nv-900); }
-.cz-buddy-visor { fill: var(--nv-700); }
-.cz-buddy-eyes { transform: translate(var(--ex, 0px), var(--ey, 0px)); transition: transform 0.18s ease-out; }
-.cz-buddy-eye { fill: var(--nv-50); transform-box: fill-box; transform-origin: center; transition: transform 0.08s ease, opacity 0.15s ease; }
+.cz-buddy-ear { fill: var(--nv-600); }
+.cz-buddy-skull { fill: url(#czb-head); }
+/* A hairline of light along the top of the head, and a glint on the visor. */
+.cz-buddy-rim { fill: none; stroke: rgba(238, 241, 248, 0.22); stroke-width: 0.8; stroke-linecap: round; }
+.cz-buddy-visor { fill: url(#czb-visor); }
+.cz-buddy-gloss { fill: none; stroke: rgba(238, 241, 248, 0.35); stroke-width: 1; stroke-linecap: round; }
+.cz-buddy-eyes { transform: translate(calc(var(--ex, 0px) * 0.7), calc(var(--ey, 0px) * 0.7)); transition: transform 0.18s ease-out; }
+.cz-buddy-eye { fill: var(--nv-50); filter: drop-shadow(0 0 1.6px rgba(185, 195, 222, 0.9)); transform-box: fill-box; transform-origin: center; transition: transform 0.08s ease, opacity 0.15s ease; }
 .cz-buddy.is-blink .cz-buddy-eye { transform: scaleY(0.12); }
-.cz-buddy-happy { fill: none; stroke: var(--nv-50); stroke-width: 2; stroke-linecap: round; opacity: 0; transition: opacity 0.15s ease; }
-.cz-buddy-smile { fill: none; stroke: var(--nv-50); stroke-width: 1.6; stroke-linecap: round; opacity: 0; transition: opacity 0.2s ease; }
-.cz-buddy-cheek { fill: var(--nv-400); opacity: 0.7; transition: opacity 0.2s ease; }
-/* While waving: happy eyes, a smile, warmer cheeks. */
+.cz-buddy-happy { fill: none; stroke: var(--nv-50); stroke-width: 1.4; stroke-linecap: round; opacity: 0; transition: opacity 0.15s ease; }
+.cz-buddy-smile { fill: none; stroke: var(--nv-200); stroke-width: 1.1; stroke-linecap: round; opacity: 0; transition: opacity 0.2s ease; }
+/* While waving: happy eyes and a small smile. */
 .cz-buddy.is-waving .cz-buddy-eye { opacity: 0; }
 .cz-buddy.is-waving .cz-buddy-happy, .cz-buddy.is-waving .cz-buddy-smile { opacity: 1; }
-.cz-buddy.is-waving .cz-buddy-cheek { opacity: 1; fill: var(--nv-200); }
 
 /* ── Responsive ── */
 @media (max-width: 1100px) {
@@ -931,7 +1067,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cz-think-float, .cz-buddy-bob, .cz-buddy-shadow, .cz-buddy-bulb, .cz-buddy::before { animation: none; }
+  .cz-think-float, .cz-buddy-bob, .cz-buddy-shadow, .cz-buddy-bulb, .cz-buddy-core, .cz-buddy::before { animation: none; }
   .cz *, .cz *::before, .cz *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
