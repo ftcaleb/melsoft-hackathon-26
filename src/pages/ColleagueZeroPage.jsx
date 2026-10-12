@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Icon from "../components/Icon";
 import ColleagueZeroCampus from "../components/ColleagueZeroCampus";
 import { getLeadSource, hackathonConfigured, sendHackathonRegistrationToSheet } from "../sheets";
@@ -1245,22 +1245,222 @@ function Register({ navigate }) {
         <div className="cz-vacancy">
           <Eyebrow n="08">Now hiring · 1 position</Eyebrow>
           <h2 className="cz-vacancy-title">Colleague Zero.</h2>
-          <p className="cz-lede">
-            The role: a digital colleague for education. The interview: 24 hours. Put your team
-            forward and build the colleague nobody has hired yet.
+          <p className="cz-lede cz-vacancy-lede">
+            <b>The role:</b> a digital colleague for education. <b>The interview:</b> 24 hours. Put
+            your team forward and build the colleague nobody has hired yet.
           </p>
-          <dl>
+          {/* Read as a job posting: the spec, then the itinerary, then the
+              entry stamped like the page's other stamps. */}
+          <dl className="cz-spec">
             <div><dt>Role</dt><dd>Digital colleague for education</dd></div>
             <div><dt>Team</dt><dd>Up to five people</dd></div>
+          </dl>
+          <dl className="cz-itin">
             <div><dt>Day one</dt><dd>Online · Fri 13 Nov, 11:00</dd></div>
             <div><dt>Day two</dt><dd>Melsoft offices · Sat 14 Nov, 09:00</dd></div>
             <div><dt>Presentations</dt><dd>Sat 14 Nov, 12:00</dd></div>
-            <div><dt>Entry</dt><dd>Free</dd></div>
+          </dl>
+          <dl className="cz-entry">
+            <dt>Entry</dt><dd>Free</dd>
           </dl>
         </div>
         <RegisterForm navigate={navigate} />
       </div>
     </section>
+  );
+}
+
+/* ── Countdown: the agent thinking out loud ─────────────────────────────
+   The hero's campus shows its agent thinking in dark bubbles. This is one
+   more of those bubbles, pinned to the corner of the screen: a little
+   agent (the pulsing dot) working out how long is left until the start in
+   the brief, 11:00 on Friday 13 November 2026, SAST (09:00 UTC), and
+   saying it in words. Each number that changes decodes in place, as if
+   it's being worked out live. It steps aside while the form or the footer
+   is on screen, and is gone once the hackathon has started. */
+
+const START_AT = Date.UTC(2026, 10, 13, 9, 0, 0);
+const SCRAMBLE_MS = 320;
+
+const remaining = () => {
+  const ms = Math.max(0, START_AT - Date.now());
+  const t = Math.floor(ms / 1000);
+  return { ms, d: Math.floor(t / 86400), h: Math.floor(t / 3600) % 24, m: Math.floor(t / 60) % 60, s: t % 60 };
+};
+
+// A number that flickers through random values before settling on its
+// own. The flicker stays inside the unit's range (no "74 seconds").
+function Decode({ value, max }) {
+  const ref = useRef(null);
+  const first = useRef(true);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const final = String(value);
+    el.style.minWidth = final.length + "ch";
+    if (first.current || prefersReducedMotion()) { first.current = false; el.textContent = final; return; }
+    let raf = 0;
+    const t0 = performance.now();
+    const step = (now) => {
+      const p = (now - t0) / SCRAMBLE_MS;
+      if (p >= 1) { el.textContent = final; el.classList.remove("is-busy"); return; }
+      // Same number of digits as the final value, so nothing shifts.
+      const lo = final.length > 1 ? 10 ** (final.length - 1) : 0;
+      const hi = Math.min(max, 10 ** final.length);
+      el.textContent = String(lo + Math.floor(Math.random() * (hi - lo)));
+      raf = requestAnimationFrame(step);
+    };
+    el.classList.add("is-busy");
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [value, max]);
+  // No children: the text is written by the layout effect above, so React
+  // never holds a reference to a text node the scramble has replaced.
+  return <b ref={ref} className="cz-think-n" />;
+}
+
+/* The little colleague the countdown bubble belongs to: half agent (a
+   head with a visor for a face and an antenna), half human (cheeks, a
+   hoodie, a name badge). Its eyes follow the pointer around the page and
+   blink now and then; it waves when it arrives, every so often while idle,
+   and whenever the bubble is hovered, smiling as it does. Everything is
+   classes and CSS custom properties set from here; no React state, so
+   the pointer never re-renders anything. */
+function AgentBuddy() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || prefersReducedMotion()) return;
+    const timers = [];
+    const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+    const wave = () => {
+      el.classList.remove("is-waving");
+      void el.getBoundingClientRect(); // restart the animation
+      el.classList.add("is-waving");
+      later(() => el.classList.remove("is-waving"), 1500);
+    };
+    const blink = () => {
+      el.classList.add("is-blink");
+      later(() => el.classList.remove("is-blink"), 140);
+      later(blink, 2600 + Math.random() * 3600);
+    };
+    const idleWave = () => { wave(); later(idleWave, 11000 + Math.random() * 6000); };
+    later(wave, 900);
+    later(blink, 2200);
+    later(idleWave, 9000);
+
+    let raf = 0, px = 0, py = 0;
+    const look = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      const dx = px - (r.left + r.width / 2), dy = py - (r.top + r.height * 0.4);
+      const d = Math.max(1, Math.hypot(dx, dy));
+      const k = Math.min(1, d / 300);
+      el.style.setProperty("--ex", ((dx / d) * 2.4 * k).toFixed(2) + "px");
+      el.style.setProperty("--ey", ((dy / d) * 1.8 * k).toFixed(2) + "px");
+      el.style.setProperty("--tilt", ((dx / d) * 5 * k).toFixed(2) + "deg");
+    };
+    const onMove = (e) => { px = e.clientX; py = e.clientY; if (!raf) raf = requestAnimationFrame(look); };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    const host = el.closest(".cz-think");
+    host?.addEventListener("pointerenter", wave);
+    return () => {
+      timers.forEach(clearTimeout);
+      cancelAnimationFrame(raf);
+      window.removeEventListener("pointermove", onMove);
+      host?.removeEventListener("pointerenter", wave);
+    };
+  }, []);
+  return (
+    <span className="cz-buddy" ref={ref} aria-hidden="true">
+      <svg viewBox="0 0 64 74">
+        <ellipse className="cz-buddy-shadow" cx="32" cy="71" rx="15" ry="2.4" />
+        <g className="cz-buddy-bob">
+          {/* Left arm, resting. */}
+          <g className="cz-buddy-arm-l">
+            <rect x="11" y="48" width="7" height="15" rx="3.5" />
+            <circle cx="14.5" cy="63.5" r="3.6" className="cz-buddy-hand" />
+          </g>
+          {/* Body: a hoodie with a name badge. */}
+          <rect className="cz-buddy-body" x="17" y="46" width="30" height="21" rx="10" />
+          <path className="cz-buddy-collar" d="M27 46.5 L32 52 L37 46.5" />
+          <rect className="cz-buddy-badge" x="36" y="54" width="7" height="8.5" rx="1.6" />
+          <rect className="cz-buddy-badge-line" x="37.6" y="58.4" width="3.8" height="1.2" rx="0.6" />
+          {/* Right arm: hangs down at rest, swings up from the shoulder to wave. */}
+          <g className="cz-buddy-arm-r">
+            <rect x="46" y="33" width="7" height="16" rx="3.5" />
+            <circle cx="49.5" cy="32.5" r="3.9" className="cz-buddy-hand" />
+          </g>
+          <g className="cz-buddy-head">
+            <line className="cz-buddy-antenna" x1="32" y1="7" x2="32" y2="14" />
+            <circle className="cz-buddy-bulb" cx="32" cy="5.5" r="3.4" />
+            <rect className="cz-buddy-skull" x="12" y="13" width="40" height="32" rx="12" />
+            <rect className="cz-buddy-visor" x="16" y="18.5" width="32" height="20" rx="8.5" />
+            <g className="cz-buddy-eyes">
+              <rect className="cz-buddy-eye" x="23" y="23.5" width="5" height="8" rx="2.5" />
+              <rect className="cz-buddy-eye" x="36" y="23.5" width="5" height="8" rx="2.5" />
+              <path className="cz-buddy-happy" d="M22.8 29 Q25.5 24.6 28.2 29 M35.8 29 Q38.5 24.6 41.2 29" />
+            </g>
+            <path className="cz-buddy-smile" d="M28.5 33.6 Q32 36.4 35.5 33.6" />
+            <circle className="cz-buddy-cheek" cx="20.2" cy="34" r="1.9" />
+            <circle className="cz-buddy-cheek" cx="43.8" cy="34" r="1.9" />
+          </g>
+        </g>
+      </svg>
+    </span>
+  );
+}
+
+function CountdownThought({ onRegister }) {
+  const [left, setLeft] = useState(remaining);
+  const [hidden, setHidden] = useState(false);
+
+  useEffect(() => {
+    let t = 0;
+    // Tick on the second boundary so every number changes together.
+    const tick = () => {
+      setLeft(remaining());
+      t = setTimeout(tick, 1000 - (Date.now() % 1000) + 5);
+    };
+    tick();
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    const blockers = new Set();
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => (e.isIntersecting ? blockers.add(e.target) : blockers.delete(e.target)));
+      setHidden(blockers.size > 0);
+    }, { rootMargin: "0px 0px -15% 0px" });
+    document.querySelectorAll("#register, .cz-closer, .cz-footer").forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  if (left.ms <= 0) return null;
+  const pad = (n) => String(n).padStart(2, "0");
+  return (
+    <a
+      href="#register"
+      className={"cz-think" + (hidden ? "" : " is-shown")}
+      onClick={onRegister}
+      tabIndex={hidden ? -1 : 0}
+      aria-hidden={hidden}
+      aria-label={`Hackathon starts in ${left.d} days, ${left.h} hours and ${left.m} minutes. Register your team.`}
+    >
+      <span className="cz-think-float">
+        {/* Two quiet lines: the days in words, then the rest ticking small. */}
+        <span className="cz-think-bubble" aria-hidden="true">
+          <span className="cz-think-line">
+            Hackathon starts in <b className="cz-think-days"><Decode value={left.d} max={Math.max(10, left.d + 1)} /> {left.d === 1 ? "day" : "days"}</b>
+          </span>
+          <span className="cz-think-tick">
+            <Decode value={pad(left.h)} max={24} />h <Decode value={pad(left.m)} max={60} />m <Decode value={pad(left.s)} max={60} />s
+          </span>
+          <span className="cz-think-go">Register your team <Icon name="arrow-right" size={15} /></span>
+        </span>
+        <AgentBuddy />
+      </span>
+    </a>
   );
 }
 
@@ -1329,6 +1529,7 @@ const ColleagueZeroPage = ({ navigate }) => {
       </section>
 
       <CzFooter navigate={navigate} />
+      <CountdownThought onRegister={goRegister} />
     </main>
   );
 };
