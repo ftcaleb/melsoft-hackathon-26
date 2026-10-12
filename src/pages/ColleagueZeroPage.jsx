@@ -24,10 +24,18 @@ import "./ColleagueZero.css";
    the challenge, what a strong project does, example ideas, the two-day
    schedule and what teams present. */
 
-// The hero's date. The full schedule is SCHEDULE, further down.
-const EVENT = {
-  dateShort: "13 November 2026", // hero facts row, where the weekday won't fit
-};
+// "Add to calendar": one event from the online start on Friday to the end
+// of presentations on Saturday, in UTC (SAST is UTC+2).
+const CALENDAR_ICS = [
+  "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Melsoft Academy//Colleague Zero//EN",
+  "BEGIN:VEVENT", "UID:colleague-zero-2026@melsoft", "DTSTAMP:20261012T000000Z",
+  "DTSTART:20261113T090000Z", "DTEND:20261114T120000Z",
+  "SUMMARY:Colleague Zero: the autonomous agent hackathon",
+  "LOCATION:Online on Friday. Melsoft offices\\, 173 Oxford Road\\, Rosebank on Saturday",
+  "DESCRIPTION:Starts online 11:00 Fri 13 Nov. Sat 14 Nov: doors open 09:00\\, hacking ends 11:00\\, presentations 12:00.",
+  "END:VEVENT", "END:VCALENDAR",
+].join("\r\n");
+const CALENDAR_HREF = "data:text/calendar;charset=utf-8," + encodeURIComponent(CALENDAR_ICS);
 
 const REGISTERED_PATH = "/colleague-zero/registered";
 const STORAGE_KEY = "cz-registration";
@@ -158,7 +166,7 @@ function CzFooter({ navigate }) {
           </p>
         </div>
         <div className="cz-footer-meta">
-          <span className="cz-mono">MEL-HACK-2026-003</span>
+          <span className="cz-mono">Colleague Zero · Autonomous agent hackathon · 13–14 Nov 2026</span>
           <a href="/" onClick={(e) => { e.preventDefault(); navigate("/"); }}>melsoftacademy.com</a>
           <a href="/privacy-policy" onClick={(e) => { e.preventDefault(); navigate("/privacy-policy"); }}>Privacy policy</a>
         </div>
@@ -176,10 +184,44 @@ function Eyebrow({ n, children }) {
   );
 }
 
+/* ── Ticker ────────────────────────────────────────────────────────────
+   One row at one steady speed, forever. The track holds the list twice and
+   slides left by exactly half its width, so the loop has no seam. */
+
+const TICKER = ["24-hour hackathon", "13–14 November 2026", "Online, then in the room", "Up to five people", "Build a digital colleague", "Real problems in EdTech"];
+
+function Ticker() {
+  // Each half repeats the list twice so it is wider than any screen.
+  const half = [...TICKER, ...TICKER];
+  return (
+    <div className="cz-ticker">
+      <p className="cz-sr">{TICKER.join(". ")}.</p>
+      <div className="cz-ticker-row" aria-hidden="true">
+        <div className="cz-ticker-track">
+          {[0, 1].map((k) => (
+            <div key={k} className="cz-ticker-half">
+              {half.map((t, i) => (
+                <span key={i} className="cz-ticker-item">{t}</span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Sections ────────────────────────────────────────────────────────── */
 
 // Words wrapped in *asterisks* are set in maroon.
 const MANIFESTO = "Not a chatbot. Not an automation. A *colleague.*";
+
+const STATS = [
+  { n: "24", k: "Hours", cap: "Starts 11:00 Friday, ends 11:00 Saturday" },
+  { n: "2", k: "Days", cap: "Day one is fully virtual. Day two is in person" },
+  { n: "5", k: "Max team", cap: "A maximum of five people" },
+  { n: "2+", k: "Agents", cap: "More than one agent, each with a clear role" },
+];
 
 function Manifesto() {
   const ref = useRef(null);
@@ -203,11 +245,15 @@ function Manifesto() {
             })}
           </span>
         </p>
+        <p className="cz-lede cz-manifesto-lede">
+          Colleague Zero is a 24-hour hackathon on multi-agent workflows. Your team builds an
+          autonomous digital employee for education: agents that reason, correct their own
+          mistakes, and carry a complex job from start to finish.
+        </p>
         <dl className="cz-stats">
-          <div><dt>Hours</dt><dd>24</dd></div>
-          <div><dt>Days</dt><dd>2</dd></div>
-          <div><dt>Max team</dt><dd>5</dd></div>
-          <div><dt>Agents</dt><dd>2+</dd></div>
+          {STATS.map((x) => (
+            <div key={x.k}><dt>{x.k}</dt><dd>{x.n}</dd><p className="cz-stats-cap">{x.cap}</p></div>
+          ))}
         </dl>
       </div>
     </section>
@@ -217,8 +263,8 @@ function Manifesto() {
 // The overview's own contrast: what this hackathon is not, then what it is.
 const CONTRAST = [
   { name: "A chatbot", tease: "Waits for a question and answers it. Not what we're asking for." },
-  { name: "An automation", tease: "Follows a fixed script. Not what we're asking for either." },
-  { name: "A digital colleague", tease: "Is given a goal, plans the work, uses tools to do it, checks its own output, and fixes what's wrong." },
+  { name: "An automation", tease: "Follows a fixed script, every time. Not what we're asking for either." },
+  { name: "A digital colleague", tease: "Takes a goal, plans the steps, uses tools, checks its work and fixes its own mistakes." },
 ];
 
 function Challenge() {
@@ -229,8 +275,9 @@ function Challenge() {
           <Eyebrow n="02">The challenge</Eyebrow>
           <h2 className="cz-h2">Build a digital colleague.</h2>
           <p className="cz-lede">
-            This is not a chatbot hackathon. Build a system of agents that carries out complex work
-            from start to finish, without a person stepping in at every stage.
+            Give it a goal and step back. Your colleague plans the work, uses tools to do it, checks
+            its own output, and fixes what's wrong, without a person stepping in at every stage. One
+            rule: it has to solve a real problem in EdTech.
           </p>
           <p className="cz-note cz-mono">Every project solves a real problem in EdTech</p>
         </div>
@@ -252,11 +299,11 @@ function Challenge() {
    into view the bars wipe away one after another and the stamp flips to
    "Declassified". With reduced motion it simply starts declassified. */
 const DOSSIER = [
-  ["Reasons.", "Breaks a goal into steps and decides what to do next, rather than following a fixed script."],
+  ["Reasons.", "Breaks a goal into steps and decides what to do next, instead of following a fixed script."],
   ["Self-corrects.", "Reviews its own work, catches errors, and tries again."],
-  ["Executes.", "Completes a multi-step workflow and produces a finished result, not a suggestion."],
-  ["Collaborates.", "Uses more than one agent, each with a clear role, handing work to one another."],
-  ["Serves education.", "Addresses a specific, real need in teaching, learning, or running an education programme."],
+  ["Executes.", "Finishes a multi-step workflow and hands over a result, not a suggestion."],
+  ["Collaborates.", "Uses more than one agent, each with a clear role, passing work between them."],
+  ["Serves education.", "Meets a specific, real need in teaching, learning, or running an education programme."],
 ];
 
 function Dossier() {
@@ -280,8 +327,9 @@ function Dossier() {
           <Eyebrow n="03">What a strong project does</Eyebrow>
           <h2 className="cz-h2">Five things a real colleague does.</h2>
           <p className="cz-lede">
-            Think about the work learners, facilitators and education teams do every day, and build
-            the colleague who could take it on.
+            Use this as your checklist. A project that does all five is exactly what we're asking
+            for. Think about the work learners, facilitators and education teams do every day, and
+            build the colleague who could take it on.
           </p>
           <span className="cz-dossier-stamp cz-mono" aria-hidden="true">
             <span className="cz-stamp-a">Classified</span>
@@ -304,21 +352,33 @@ function Dossier() {
 }
 
 const IDEAS = [
-  { short: "a marking colleague.", t: "Marking.", v: "Assesses submissions against a rubric, writes feedback, and reviews its own marks for consistency." },
+  { short: "a marking colleague.", t: "Marking.", v: "Assesses submissions against a rubric, writes feedback, and checks its own marks for consistency." },
   { short: "a curriculum colleague.", t: "Curriculum.", v: "Drafts lesson plans, builds matching exercises, and checks them against learning outcomes." },
   { short: "a learner support colleague.", t: "Learner support.", v: "Spots learners falling behind, works out why, and prepares a personalised catch-up plan." },
   { short: "an admissions colleague.", t: "Admissions.", v: "Screens applications, requests missing information, and schedules interviews." },
   { short: "a career colleague.", t: "Careers.", v: "Matches graduates to roles, tailors their CVs, and prepares them for interviews." },
-  { short: "something only you'd think of.", t: "Your own.", v: "These are examples only. Teams are free to choose their own EdTech problem." },
+  { t: "Your own.", v: "Know a job in education that eats hours every week? Build the colleague who takes it on." },
 ];
+// The headline cycles through the five named ideas; "Your own" is a card only.
+const ROTATING = IDEAS.filter((d) => d.short);
+
+/* The ideas as an index tied to the headline: whichever idea the headline
+   is showing is lit in the list, with a hairline that fills while it's on
+   (a countdown to the next one). Pointing at or tabbing to an idea pins
+   the headline to it; leaving resumes the rotation. "Your own" isn't in
+   the rotation and is drawn as an open slot. */
+const IDEA_MS = 2800;
 
 function Ideas() {
   const [i, setI] = useState(0);
+  const [held, setHeld] = useState(false);
   useEffect(() => {
-    if (prefersReducedMotion()) return;
-    const t = setInterval(() => setI((n) => (n + 1) % IDEAS.length), 2800);
+    if (held || prefersReducedMotion()) return;
+    const t = setInterval(() => setI((n) => (n + 1) % ROTATING.length), IDEA_MS);
     return () => clearInterval(t);
-  }, []);
+  }, [held]);
+  const hold = (n) => { if (n < ROTATING.length) { setI(n); setHeld(true); } };
+  const release = () => setHeld(false);
   return (
     <section className="cz-section cz-twist" id="ideas">
       <div className="cz-wrap">
@@ -326,28 +386,49 @@ function Ideas() {
         <h2 className="cz-twist-line">
           Your colleague could be{" "}
           <span className="cz-rotator">
-            <span className="cz-sr">{IDEAS.map((d) => d.short).join(" Or ")}</span>
-            {IDEAS.map((d, n) => (
+            <span className="cz-sr">{ROTATING.map((d) => d.short).join(" Or ")}</span>
+            {ROTATING.map((d, n) => (
               <span
                 key={d.t}
                 aria-hidden="true"
-                className={n === i ? "is-on" : n === (i + IDEAS.length - 1) % IDEAS.length ? "is-out" : ""}
+                className={n === i ? "is-on" : n === (i + ROTATING.length - 1) % ROTATING.length ? "is-out" : ""}
               >
                 {d.short}
               </span>
             ))}
           </span>
         </h2>
-        <ul className="cz-cams">
-          {IDEAS.map((d) => <li key={d.t}><b>{d.t}</b> {d.v}</li>)}
-        </ul>
+        <p className="cz-lede">
+          Stuck for a problem? Start with one of these, or bring your own. Any real EdTech problem counts.
+        </p>
+        <ol className={"cz-ideas" + (held ? " is-held" : "")} onMouseLeave={release}>
+          {IDEAS.map((d, n) => {
+            const own = !d.short;
+            return (
+              <li
+                key={d.t}
+                className={(own ? "is-own" : "") + (n === i && !own ? " is-on" : "")}
+                tabIndex={own ? undefined : 0}
+                onMouseEnter={() => hold(n)}
+                onFocus={() => hold(n)}
+                onBlur={release}
+              >
+                {/* Keyed on i so the fill restarts each time an idea comes round. */}
+                <span className="cz-idea-bar" key={n === i ? `on-${i}` : "off"} aria-hidden="true" />
+                <span className="cz-idea-n" aria-hidden="true">{own ? "+" : String(n + 1).padStart(2, "0")}</span>
+                <h3>{d.t.replace(/\.$/, "")}</h3>
+                <p>{d.v}</p>
+              </li>
+            );
+          })}
+        </ol>
       </div>
     </section>
   );
 }
 
 const SCHEDULE = [
-  { day: "Fri 13 Nov", time: "11:00", t: "Hackathon starts", where: "Virtual" },
+  { day: "Fri 13 Nov", time: "11:00", t: "Hackathon starts", where: "Online" },
   { day: "Sat 14 Nov", time: "09:00", t: "Doors open", where: "Melsoft offices" },
   { day: "Sat 14 Nov", time: "11:00", t: "Hacking ends", where: "Melsoft offices" },
   { day: "Sat 14 Nov", time: "12:00", t: "Presentations", where: "Melsoft offices" },
@@ -363,8 +444,8 @@ function Schedule() {
             <h2 className="cz-h2">24 hours. Online, then in the room.</h2>
           </div>
           <p className="cz-lede">
-            Day one is fully virtual. Day two is in person at the Melsoft offices, 173 Oxford Road,
-            Rosebank, where teams finish their projects and present them.
+            Day one is fully virtual, so build from wherever you are. Day two is in person at the
+            Melsoft offices, 173 Oxford Road, Rosebank, where teams finish their projects and present them.
           </p>
         </div>
         <ol className="cz-timeline cz-timeline--4">
@@ -376,30 +457,327 @@ function Schedule() {
             </li>
           ))}
         </ol>
+        <a className="cz-cal-link" href={CALENDAR_HREF} download="colleague-zero.ics">
+          <Icon name="calendar" size={18} /> Add the dates to your calendar
+        </a>
       </div>
     </section>
   );
 }
 
 /* The show: what a live demo looks like, using one of the example ideas.
-   Each dot is an agent with its own role, moving work between stations.
-   The marker and reviewer pass work back and forth: that loop is the
-   self-correction teams are asked to show, not a sign of trouble. */
-const STATIONS = [
-  { x: 330, y: 70, w: 140, h: 70, t: "Submissions" },
-  { x: 120, y: 105, w: 120, h: 70, t: "Rubric" },
-  { x: 590, y: 110, w: 130, h: 80, t: "Marker" },
-  { x: 90, y: 295, w: 140, h: 90, t: "Feedback" },
-  { x: 520, y: 262, w: 130, h: 80, t: "Reviewer" },
-  { x: 330, y: 340, w: 140, h: 70, t: "Learners" },
+   A marking colleague drawn as a connected workflow. Work travels the
+   links as a pulse, each station lights as it arrives, and the log writes
+   up every step. The reviewer sends work back once: that loop is the
+   self-correction teams are asked to show. On narrow screens the same
+   graph is laid out top to bottom so the labels stay readable. */
+
+const FLOW_W = 112, FLOW_H = 56;
+const FLOW_NODES = {
+  // [x, y] wide (800 × 420), [x, y] tall (380 × 668)
+  submissions: { t: "Submissions", kind: "Input", wide: [24, 182], tall: [160, 16] },
+  planner: { t: "Planner", kind: "Agent", wide: [184, 182], tall: [160, 120] },
+  marker: { t: "Marker", kind: "Agent", wide: [356, 92], tall: [160, 240] },
+  rubric: { t: "Rubric", kind: "Tool", wide: [356, 272], tall: [8, 240] },
+  reviewer: { t: "Reviewer", kind: "Agent", wide: [524, 182], tall: [160, 360] },
+  feedback: { t: "Feedback", kind: "Agent", wide: [664, 92], tall: [160, 480] },
+  learners: { t: "Learners", kind: "Output", wide: [664, 272], tall: [160, 596] },
+};
+const FLOW_EDGES = [
+  { id: "e1", from: "submissions", to: "planner" },
+  { id: "e2", from: "planner", to: "marker" },
+  { id: "e3", from: "rubric", to: "marker", tool: true },
+  { id: "e4", from: "marker", to: "reviewer" },
+  { id: "e5", from: "reviewer", to: "marker", back: true },
+  { id: "e6", from: "reviewer", to: "feedback" },
+  { id: "e7", from: "feedback", to: "learners" },
 ];
-// Paths run between station doors.
-const AGENTS = [
-  { cls: "g1", dur: 9, d: "M400 150 L200 185 L400 150 L655 200 L400 150" },
-  { cls: "g2", dur: 8, d: "M655 200 L585 262 L655 200 L585 262 L160 280 L655 200" },
-  { cls: "g3", dur: 10, d: "M585 262 L655 200 L585 262 L655 200 L585 262" },
-  { cls: "g4", dur: 11, d: "M160 280 L400 330 L160 280" },
+// One run of the demo, in seconds. Hops move a pulse along an edge; status
+// events change what a station says; the inspector follows one essay.
+const FLOW_LOOP = 15;
+const FLOW_HOPS = [
+  { edge: "e1", at: 0.2, dur: 0.8 },
+  { edge: "e2", at: 1.8, dur: 0.8 },
+  { edge: "e3", at: 1.8, dur: 0.8 },
+  { edge: "e4", at: 4.6, dur: 0.8 },
+  { edge: "e5", at: 6.4, dur: 1.0 },
+  { edge: "e4", at: 8.2, dur: 0.8 },
+  { edge: "e6", at: 9.6, dur: 0.8 },
+  { edge: "e7", at: 11.8, dur: 0.8 },
 ];
+// [node, at, state, text]. A station shows its latest event; before its
+// first one it's "Waiting". The marker's count is filled in live.
+const FLOW_STATUS = [
+  ["submissions", 0, "done", "24 essays"],
+  ["planner", 1.0, "work", "Planning"],
+  ["planner", 1.8, "done", "3 steps"],
+  ["rubric", 1.8, "work", "Sharing"],
+  ["rubric", 2.6, "done", "Shared"],
+  ["marker", 2.6, "work", "Marking"],
+  ["marker", 4.6, "done", "24 marked"],
+  ["reviewer", 5.4, "work", "Checking"],
+  ["reviewer", 6.4, "flag", "2 sent back"],
+  ["marker", 7.4, "work", "Fixing 2"],
+  ["marker", 8.2, "done", "2 fixed"],
+  ["reviewer", 9.0, "work", "Re-checking"],
+  ["reviewer", 9.6, "done", "Approved"],
+  ["feedback", 10.4, "work", "Writing"],
+  ["feedback", 11.8, "done", "24 written"],
+  ["learners", 12.6, "done", "24 notified"],
+];
+const MARKING = [2.6, 4.6];
+const FLOW_STEPS = [
+  { t: "Plan", at: 0 },
+  { t: "Mark", at: 1.8 },
+  { t: "Review", at: 4.6 },
+  { t: "Fix", at: 6.4 },
+  { t: "Approve", at: 8.2 },
+  { t: "Feedback", at: 9.6 },
+  { t: "Deliver", at: 11.8 },
+];
+// The essay the inspector follows. Evidence is marked too high, sent back
+// by the reviewer and corrected by the marker.
+const ESSAY_ROWS = [
+  { t: "Argument", score: 7, fill: [2.8, 3.4] },
+  { t: "Evidence", score: 6, fixed: 4, fill: [3.4, 4.0] },
+  { t: "Structure", score: 8, fill: [4.0, 4.6] },
+];
+const FEEDBACK = "Strong argument and a clear structure. Back each claim with a source from the reading to lift your evidence mark.";
+const FEEDBACK_TYPE = [10.4, 11.8];
+const stepAt = (t) => FLOW_STEPS.reduce((k, s, i) => (t >= s.at ? i : k), 0);
+
+function flowLayout(tall) {
+  const box = (k) => {
+    const [x, y] = FLOW_NODES[k][tall ? "tall" : "wide"];
+    return { x, y, cx: x + FLOW_W / 2, cy: y + FLOW_H / 2 };
+  };
+  const edges = FLOW_EDGES.map((e) => {
+    const a = box(e.from), b = box(e.to);
+    let d;
+    if (e.back) {
+      // The send-back arcs outside the main line so it reads as a return.
+      d = tall
+        ? `M${a.x + FLOW_W} ${a.cy} C${a.x + FLOW_W + 70} ${a.cy} ${b.x + FLOW_W + 70} ${b.cy} ${b.x + FLOW_W} ${b.cy}`
+        : `M${a.cx} ${a.y} C${a.cx} ${a.y - 80} ${b.cx + 40} ${b.y - 80} ${b.cx + 20} ${b.y}`;
+    } else if (Math.abs(b.cx - a.cx) >= Math.abs(b.cy - a.cy)) {
+      const s = b.cx > a.cx ? 1 : -1;
+      const x1 = s > 0 ? a.x + FLOW_W : a.x, x2 = s > 0 ? b.x : b.x + FLOW_W;
+      const k = (x2 - x1) / 2;
+      d = `M${x1} ${a.cy} C${x1 + k} ${a.cy} ${x2 - k} ${b.cy} ${x2} ${b.cy}`;
+    } else {
+      const s = b.cy > a.cy ? 1 : -1;
+      const y1 = s > 0 ? a.y + FLOW_H : a.y, y2 = s > 0 ? b.y : b.y + FLOW_H;
+      const k = (y2 - y1) / 2;
+      d = `M${a.cx} ${y1} C${a.cx} ${y1 + k} ${b.cx} ${y2 - k} ${b.cx} ${y2}`;
+    }
+    return { ...e, d };
+  });
+  return { boxes: Object.fromEntries(Object.keys(FLOW_NODES).map((k) => [k, box(k)])), edges };
+}
+
+const easeInOut = (p) => (p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2);
+
+const clamp01 = (v) => Math.min(1, Math.max(0, v));
+
+function FlowDemo() {
+  const ref = useRef(null);
+  const [tall, setTall] = useState(() => typeof window !== "undefined" && window.matchMedia?.("(max-width: 600px)").matches);
+  useEffect(() => {
+    const mq = window.matchMedia?.("(max-width: 600px)");
+    if (!mq) return;
+    const on = () => setTall(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  const { boxes, edges } = useMemo(() => flowLayout(tall), [tall]);
+
+  useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    const q = (sel) => root.querySelector(sel);
+    const paths = Object.fromEntries(edges.map((e) => [e.id, q(`[data-live="${e.id}"]`)]));
+    const lens = Object.fromEntries(edges.map((e) => [e.id, paths[e.id].getTotalLength()]));
+    const pulses = FLOW_HOPS.map((_, i) => q(`[data-pulse="${i}"]`));
+    const nodes = Object.fromEntries(Object.keys(FLOW_NODES).map((k) => [k, { el: q(`[data-node="${k}"]`), txt: q(`[data-status="${k}"]`) }]));
+    const steps = [...root.querySelectorAll(".cz-steps li")];
+    const k = (name) => q(`[data-k="${name}"]`);
+    const el = {
+      stage: k("stage"), total: k("total"), note: k("note"), fb: k("fb"), sent: k("sent"),
+      clock: k("clock"), bar: k("bar"), inspect: q(".cz-inspect"),
+      rows: ESSAY_ROWS.map((_, i) => ({ li: q(`[data-row="${i}"]`), bar: q(`[data-row="${i}"] b`), score: k("score" + i) })),
+    };
+    // Only touch the DOM when a value actually changes.
+    const cache = new Map();
+    const set = (node, key, v, how = "text") => {
+      const seen = cache.get(node) || {};
+      if (seen[key] === v) return;
+      seen[key] = v;
+      cache.set(node, seen);
+      if (how === "text") node.textContent = v;
+      else if (how === "html") node.innerHTML = v;
+      // setAttribute rather than className, which is read-only on SVG.
+      else if (how === "class") node.setAttribute("class", v);
+      else node.style.setProperty(how, v);
+    };
+
+    const paint = (t, still = false) => {
+      // Links and pulses.
+      const drawn = {};
+      FLOW_HOPS.forEach((h, i) => {
+        const p = (t - h.at) / h.dur;
+        const dot = pulses[i];
+        if (!still && p >= 0 && p <= 1) {
+          const pt = paths[h.edge].getPointAtLength(easeInOut(p) * lens[h.edge]);
+          dot.setAttribute("cx", pt.x.toFixed(1));
+          dot.setAttribute("cy", pt.y.toFixed(1));
+          dot.style.opacity = "1";
+          drawn[h.edge] = Math.max(drawn[h.edge] ?? 0, easeInOut(p));
+        } else {
+          dot.style.opacity = "0";
+          if (p > 1 && t - (h.at + h.dur) < 0.9) drawn[h.edge] = Math.max(drawn[h.edge] ?? 0, 1);
+        }
+      });
+      edges.forEach((e) => {
+        const v = still ? 1 : drawn[e.id];
+        paths[e.id].style.strokeDashoffset = v == null ? "1" : String(1 - v);
+        paths[e.id].style.opacity = v == null ? "0" : still ? "0.35" : "1";
+      });
+
+      // Station status.
+      const latest = {};
+      FLOW_STATUS.forEach(([n, at, state, text]) => { if (t >= at) latest[n] = { state, text }; });
+      Object.entries(nodes).forEach(([n, { el: g, txt }]) => {
+        let s = latest[n] || { state: "idle", text: "Waiting" };
+        if (n === "marker" && s.text === "Marking") {
+          s = { ...s, text: `Marking ${Math.floor(clamp01((t - MARKING[0]) / (MARKING[1] - MARKING[0])) * 24)}/24` };
+        }
+        set(txt, "t", s.text);
+        set(g, "c", "cz-node is-" + FLOW_NODES[n].kind.toLowerCase() + " is-" + s.state, "class");
+      });
+
+      // Step track and clock.
+      const cur = stepAt(t);
+      steps.forEach((li, i) => li.className = i < cur ? "is-done" : i === cur ? "is-on" : "");
+      set(el.bar, "w", String(clamp01(t / 12.6)), "--p");
+      set(el.clock, "t", `0:${String(Math.min(59, Math.floor(t))).padStart(2, "0")}`);
+      set(el.stage, "t", FLOW_STEPS[cur].t);
+
+      // The essay.
+      const fixed = t >= 8.2;
+      let total = 0, allIn = true;
+      ESSAY_ROWS.forEach((r, i) => {
+        const p = clamp01((t - r.fill[0]) / (r.fill[1] - r.fill[0]));
+        const score = fixed && r.fixed != null ? r.fixed : r.score;
+        set(el.rows[i].bar, "w", String((p * score) / 10), "--p");
+        set(el.rows[i].score, "h", p <= 0 ? "–" : fixed && r.fixed != null ? `<s>${r.score}</s> ${score}/10` : `${Math.round(p * score)}/10`, "html");
+        set(el.rows[i].li, "c", r.fixed != null && t >= 6.4 && !fixed ? "is-flag" : r.fixed != null && fixed ? "is-fixed" : "", "class");
+        if (p < 1) allIn = false;
+        total += score;
+      });
+      set(el.total, "t", allIn ? `${total}/30` : "–");
+      set(el.note, "h", t < 6.4 ? "" : !fixed
+        ? "<b>Reviewer</b> Evidence is marked too high for the rubric. Sent back to the marker."
+        : "<b>Marker</b> Evidence corrected from 6 to 4. Total updated.", "html");
+      set(el.note, "c", t < 6.4 ? "cz-inspect-note" : fixed ? "cz-inspect-note is-on" : "cz-inspect-note is-on is-flag", "class");
+      const typed = Math.floor(clamp01((t - FEEDBACK_TYPE[0]) / (FEEDBACK_TYPE[1] - FEEDBACK_TYPE[0])) * FEEDBACK.length);
+      set(el.fb, "t", t < FEEDBACK_TYPE[0] ? "Written once the marks are approved." : FEEDBACK.slice(0, typed));
+      set(el.fb, "c", t < FEEDBACK_TYPE[0] ? "is-wait" : typed < FEEDBACK.length ? "is-typing" : "", "class");
+      set(el.inspect, "c", "cz-inspect" + (t >= 9.6 ? " is-approved" : "") + (t >= 12.6 ? " is-sent" : ""), "class");
+      set(el.sent, "t", t >= 12.6 ? "Sent to the learner" : "Not sent yet");
+    };
+    if (prefersReducedMotion()) { paint(13.5, true); return; }
+
+    let raf = 0, t0 = 0, prev = 0, visible = true;
+    const frame = (now) => {
+      raf = 0;
+      if (!visible) return;
+      if (!t0) t0 = now - prev * 1000;
+      const t = ((now - t0) / 1000) % FLOW_LOOP;
+      prev = t;
+      paint(t);
+      raf = requestAnimationFrame(frame);
+    };
+    const io = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible && !raf) { t0 = 0; raf = requestAnimationFrame(frame); }
+    });
+    io.observe(root);
+    raf = requestAnimationFrame(frame);
+    return () => { cancelAnimationFrame(raf); io.disconnect(); };
+  }, [edges]);
+
+  const vb = tall ? "0 0 380 668" : "0 0 800 420";
+  return (
+    <div className="cz-show-grid" ref={ref}>
+      <div className="cz-show-main">
+        <svg viewBox={vb} className={"cz-flow" + (tall ? " is-tall" : "")} role="img" aria-label="An example marking colleague at work. Submissions go to a planner agent, then to a marker agent that uses the rubric, then to a reviewer agent. The reviewer sends work back to the marker to correct, approves it, and passes it to a feedback agent that writes reports for the learners.">
+          {edges.map((e) => (
+            <g key={e.id} className={"cz-link" + (e.tool ? " is-tool" : "") + (e.back ? " is-back" : "")}>
+              <path d={e.d} className="cz-link-base" />
+              <path d={e.d} className="cz-link-live" data-live={e.id} pathLength="1" />
+            </g>
+          ))}
+          {FLOW_HOPS.map((h, i) => {
+            const e = FLOW_EDGES.find((x) => x.id === h.edge);
+            return (
+              <g key={i} className={"cz-pulse" + (e.back ? " is-back" : "")}>
+                <circle data-pulse={i} r="6" cx="-20" cy="-20" />
+              </g>
+            );
+          })}
+          {Object.entries(FLOW_NODES).map(([key, n]) => {
+            const b = boxes[key];
+            return (
+              <g key={key} data-node={key} className={"cz-node is-" + n.kind.toLowerCase() + " is-idle"} transform={`translate(${b.x} ${b.y})`}>
+                <rect className="cz-node-halo" x="-5" y="-5" width={FLOW_W + 10} height={FLOW_H + 10} rx="15" />
+                <rect className="cz-node-box" width={FLOW_W} height={FLOW_H} rx="12" />
+                {n.kind === "Agent" && <circle className="cz-node-dot" cx="16" cy="20" r="4" />}
+                <text className="cz-node-t" x={n.kind === "Agent" ? 26 : 14} y="24">{n.t}</text>
+                <text className="cz-node-k" x="14" y="42" data-status={key}>Waiting</text>
+              </g>
+            );
+          })}
+        </svg>
+        <div className="cz-steps-wrap" aria-hidden="true">
+          <ol className="cz-steps">
+            {FLOW_STEPS.map((s) => <li key={s.t}><i />{s.t}</li>)}
+          </ol>
+          <span className="cz-steps-bar"><b data-k="bar" /></span>
+          <span className="cz-steps-clock cz-mono">Run time <b data-k="clock">0:00</b></span>
+        </div>
+      </div>
+
+      <aside className="cz-inspect" aria-hidden="true">
+        <div className="cz-inspect-head">
+          <span className="cz-mono">Essay 14 of 24</span>
+          <span className="cz-inspect-stage cz-mono" data-k="stage">Plan</span>
+        </div>
+        <ul className="cz-inspect-rows">
+          {ESSAY_ROWS.map((r, i) => (
+            <li key={r.t} data-row={i}>
+              <span>{r.t}</span>
+              <i><b /></i>
+              <em data-k={"score" + i}>–</em>
+            </li>
+          ))}
+        </ul>
+        <div className="cz-inspect-total">
+          <span className="cz-mono">Total</span>
+          <strong data-k="total">–</strong>
+        </div>
+        <p className="cz-inspect-note" data-k="note" />
+        <div className="cz-inspect-fb">
+          <span className="cz-mono">Feedback</span>
+          <p data-k="fb" className="is-wait">Written once the marks are approved.</p>
+        </div>
+        <div className="cz-inspect-foot">
+          <span className="cz-inspect-sent"><Icon name="check" size={14} strokeWidth={3} /><span data-k="sent">Not sent yet</span></span>
+          <span className="cz-inspect-stamp cz-mono">Approved</span>
+        </div>
+      </aside>
+    </div>
+  );
+}
 
 function TheShow() {
   return (
@@ -411,8 +789,8 @@ function TheShow() {
             <h2 className="cz-h2">Then show it working, live.</h2>
           </div>
           <p className="cz-lede">
-            Presentations start at 12:00 on Saturday at the Melsoft offices. Every team runs a live
-            demonstration of its digital colleague completing its workflow.
+            At 12:00 on Saturday, every team presents at the Melsoft offices with a live
+            demonstration of its digital colleague completing its workflow. The room watches it run.
           </p>
         </div>
 
@@ -423,27 +801,7 @@ function TheShow() {
             <span><i className="cz-live-dot" aria-hidden="true" /> Live · demo</span>
             <span>Example · a marking colleague</span>
           </div>
-          <svg viewBox="0 0 800 450" role="img" aria-label="An example marking colleague at work: four agents move work between submissions, the rubric, the marker, the reviewer, feedback and learners. The marker and reviewer pass work back and forth until it's right.">
-            {STATIONS.map((b) => (
-              <g key={b.t}>
-                <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="10" className="cz-map-b" />
-                <text x={b.x + 12} y={b.y + 22} className="cz-map-t">{b.t}</text>
-              </g>
-            ))}
-            {AGENTS.map((g) => (
-              <g key={g.cls} className={`cz-ghost ${g.cls}`} style={{ "--dur": `${g.dur}s` }}>
-                <path d={g.d} pathLength="1" className="cz-ghost-trail" />
-                <circle r="7" className="cz-ghost-dot">
-                  <animateMotion dur={`${g.dur}s`} repeatCount="indefinite" path={g.d} />
-                </circle>
-              </g>
-            ))}
-          </svg>
-          <ol className="cz-screen-board cz-mono" aria-label="Example agent log">
-            <li><b>1</b> Planner <em>3 steps</em></li>
-            <li><b>2</b> Marker <em>24 marked</em></li>
-            <li><b>3</b> Reviewer <em>2 sent back</em></li>
-          </ol>
+          <FlowDemo />
         </figure>
 
         <ul className="cz-cams">
@@ -468,6 +826,7 @@ function WhatToPresent() {
     <section className="cz-section">
       <div className="cz-wrap">
         <Eyebrow n="07">What to present</Eyebrow>
+        <h2 className="cz-h2 cz-rules-head">Four things to show the room.</h2>
         <ol className="cz-rules">
           {PRESENT.map((r, i) => (
             <li key={r.t}>
@@ -488,24 +847,44 @@ const FAQS = [
     a: "A 24-hour hackathon on multi-agent workflows. Teams build autonomous digital employees for education: agents that reason, correct their own mistakes, and carry out complex work from start to finish.",
   },
   {
+    q: "Does it cost anything to enter?",
+    a: "No. Colleague Zero is free to enter.",
+  },
+  {
+    q: "Who can enter?",
+    a: "Anyone. There's no age limit.",
+  },
+  {
     q: "Can we build a chatbot?",
-    a: "No. A chatbot waits for a question and answers it, and a basic automation follows a fixed script. We're asking for a system of agents that is given a goal, plans the work, uses tools, checks its own output and fixes what's wrong.",
+    a: "No. A chatbot waits for a question and answers it, and a basic automation follows a fixed script. We're asking for a system of agents that takes a goal, plans the work, uses tools, checks its own output and fixes what's wrong.",
   },
   {
     q: "What problem should we solve?",
-    a: "Any real problem in EdTech. Marking, curriculum, learner support, admissions and careers are examples to get you started. Teams are free to choose their own.",
+    a: "Any real problem in EdTech. Look at the work learners, facilitators and education teams do every day. The ideas on this page are examples only; you're free to choose your own.",
   },
   {
     q: "How big is a team?",
-    a: "Participants work in groups of up to five people. You can also register on your own.",
+    a: "Up to five people.",
+  },
+  {
+    q: "Can we start building before Friday?",
+    a: "No. There's no prep: everything is done on the day.",
   },
   {
     q: "When and where?",
-    a: "It starts online at 11:00 on Friday, 13 November 2026. On Saturday, 14 November, doors open at 09:00 at the Melsoft offices, 173 Oxford Road, Rosebank. Hacking ends at 11:00 and presentations start at 12:00.",
+    a: "We start online at 11:00 on Friday 13 November. On Saturday 14 November we meet at the Melsoft offices, 173 Oxford Road, Rosebank: doors open at 09:00, hacking ends at 11:00, and presentations start at 12:00.",
+  },
+  {
+    q: "What should we bring on Saturday?",
+    a: "Your laptops. Be comfortable, and bring your game faces.",
   },
   {
     q: "What do we present?",
-    a: "The EdTech problem you chose and who it affects, a live demonstration of your digital colleague completing its workflow, how your agents reason, work together and correct their own mistakes, and what you would build next with more time.",
+    a: "The problem you chose and who it affects, a live demo of your colleague completing its workflow, how your agents reason, work together and correct their mistakes, and what you'd build next with more time.",
+  },
+  {
+    q: "Is it judged?",
+    a: "Yes. There will be judges.",
   },
   {
     q: "Who do we ask if we have questions?",
@@ -607,17 +986,19 @@ function RegisterForm({ navigate }) {
 
   const validate = () => {
     const errs = {};
-    if (!solo && !data.teamName.trim()) errs.teamName = "Your team needs a name";
-    if (!data.captainName.trim()) errs.captainName = "Required";
-    if (!data.organisation.trim()) errs.organisation = "Required";
-    if (data.phone.replace(/\D/g, "").length < 9) errs.phone = "Enter a valid phone number";
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email.trim())) errs.email = "Enter a valid email";
-    if (!solo && !data.teamSize) errs.teamSize = "Pick a team size";
+    const who = solo ? "your" : "your captain's";
+    if (!solo && !data.teamName.trim()) errs.teamName = "Add your team's name so we can register you.";
+    if (!data.captainName.trim()) errs.captainName = solo ? "Add your name so we can register you." : "Add your captain's name so we can register you.";
+    if (!data.organisation.trim()) errs.organisation = "Add your occupation so we can register you.";
+    if (data.phone.replace(/\D/g, "").length < 9) errs.phone = `Add ${who} phone number so we can register you.`;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email.trim())) errs.email = `Add ${who} email address so we can register you.`;
+    if (!solo && !data.teamSize) errs.teamSize = "Add your team's size so we can register you.";
     if (!solo) {
       present.forEach((m) => {
         if (!m.name.trim()) errs["m" + m.id] = "Add their name, or remove them";
       });
     }
+    if (!data.inPerson) errs.inPerson = solo ? "Confirm you can be there on Saturday." : "Confirm your team can be there on Saturday.";
     setErrors(errs);
     const first = Object.keys(errs)[0];
     if (first) document.getElementById("cz-" + first)?.focus();
@@ -640,7 +1021,7 @@ function RegisterForm({ navigate }) {
       organisation: data.organisation.trim(),
       teamSize: solo ? "1" : data.teamSize,
       members: solo ? "" : present.map((m) => m.name.trim()).join(", "),
-      inPerson: data.inPerson ? "Yes" : "No",
+      inPerson: data.inPerson ? "Confirmed" : "No",
       source: getLeadSource(),
     };
 
@@ -694,20 +1075,18 @@ function RegisterForm({ navigate }) {
     </div>
   );
 
-  const occupation = field("organisation", "Occupation", { placeholder: "e.g. Student, developer, analyst", autoComplete: "organization-title" });
+  const occupation = field("organisation", "Your occupation", { placeholder: "Student, developer, analyst…", autoComplete: "organization-title" });
   const phone = field("phone", solo ? "Your phone" : "Captain's phone", { type: "tel", placeholder: "082 123 4567", autoComplete: "tel" });
 
   return (
     <form className="cz-form" noValidate onSubmit={handleSubmit}>
       <h3>{solo ? "Put yourself forward" : "Put your team forward"}</h3>
-      <p className="cz-form-sub">
-        Two minutes. We'll email {solo ? "you" : "your captain"} with everything you need.
-      </p>
+      <p className="cz-form-sub">Takes two minutes.</p>
 
       <fieldset className="cz-field cz-size cz-joining">
-        <legend>Are you joining as an individual?</legend>
+        <legend>Are you entering as a team or on your own?</legend>
         <div className="cz-size-row cz-size-row--2">
-          {[[false, "No, with a team"], [true, "Yes, on my own"]].map(([v, label]) => (
+          {[[false, "With a team"], [true, "On my own"]].map(([v, label]) => (
             <label key={label} className={"cz-size-opt" + (solo === v ? " is-on" : "")}>
               <input
                 type="radio" name="joining"
@@ -750,7 +1129,7 @@ function RegisterForm({ navigate }) {
               <div className={"cz-fold" + (teamOpen ? "" : " is-open")} inert={teamOpen}>
                 <div className="cz-fold-inner">
                 <fieldset className={"cz-field cz-size" + (errors.teamSize ? " has-error" : "")}>
-                  <legend>Team size</legend>
+                  <legend>How many in your team?</legend>
                   <div className="cz-size-row">
                     {["2", "3", "4", "5"].map((n, i) => (
                       <label key={n} className={"cz-size-opt" + (data.teamSize === n ? " is-on" : "")}>
@@ -823,29 +1202,36 @@ function RegisterForm({ navigate }) {
           </div>
         </div>
 
-        <label className="cz-check">
-          <input
-            type="checkbox"
-            checked={data.inPerson}
-            onChange={(e) => update("inPerson", e.target.checked)}
-            disabled={submitting}
-          />
-          <span className="cz-check-box" aria-hidden="true"><Icon name="check" size={14} strokeWidth={3} /></span>
-          <span>
-            {solo ? "I'll" : "We'll"} join day two in person
-            <em>Sat 14 Nov, from 09:00 at the Melsoft offices, 173 Oxford Road, Rosebank. Day one is online for everyone.</em>
-          </span>
-        </label>
+        {/* Required: day two is in person for everyone. */}
+        <div className={"cz-check-wrap" + (errors.inPerson ? " has-error" : "")}>
+          <label className="cz-check">
+            <input
+              id="cz-inPerson"
+              type="checkbox"
+              checked={data.inPerson}
+              onChange={(e) => update("inPerson", e.target.checked)}
+              disabled={submitting}
+              aria-invalid={Boolean(errors.inPerson)}
+              aria-describedby={errors.inPerson ? "cz-inPerson-err" : undefined}
+            />
+            <span className="cz-check-box" aria-hidden="true"><Icon name="check" size={14} strokeWidth={3} /></span>
+            <span>
+              {solo ? "I'll" : "We'll"} be at the Melsoft offices, 173 Oxford Road, Rosebank, from 09:00 on Saturday 14 November.
+              <em>Day one is online for everyone.</em>
+            </span>
+          </label>
+          {errors.inPerson && <span className="cz-field-err" id="cz-inPerson-err">{errors.inPerson}</span>}
+        </div>
       </div>
 
       {submitError && <div className="cz-form-error" role="alert">{submitError}</div>}
 
       <button type="submit" className="cz-btn cz-btn--maroon cz-btn--block" disabled={submitting}>
-        {submitting ? "Submitting your application…" : "Submit application"}
+        {submitting ? "Submitting…" : solo ? "Submit my entry" : "Submit our team"}
         {!submitting && <Icon name="arrow-right" size={18} />}
       </button>
       <p className="cz-form-fine">
-        We use these details only to run the hackathon and contact {solo ? "you" : "your team"} about it. See our{" "}
+        <strong>Free to enter.</strong> We use these details only to run the hackathon and contact {solo ? "you" : "your team"} about it. See our{" "}
         <a href="/privacy-policy" onClick={(e) => { e.preventDefault(); navigate("/privacy-policy"); }}>privacy policy</a>.
       </p>
     </form>
@@ -860,8 +1246,8 @@ function Register({ navigate }) {
           <Eyebrow n="08">Now hiring · 1 position</Eyebrow>
           <h2 className="cz-vacancy-title">Colleague Zero.</h2>
           <p className="cz-lede">
-            The first hire at our academy who isn't a person. Put your team forward, or join on
-            your own, and build it with us over 24 hours.
+            The role: a digital colleague for education. The interview: 24 hours. Put your team
+            forward and build the colleague nobody has hired yet.
           </p>
           <dl>
             <div><dt>Role</dt><dd>Digital colleague for education</dd></div>
@@ -869,6 +1255,7 @@ function Register({ navigate }) {
             <div><dt>Day one</dt><dd>Online · Fri 13 Nov, 11:00</dd></div>
             <div><dt>Day two</dt><dd>Melsoft offices · Sat 14 Nov, 09:00</dd></div>
             <div><dt>Presentations</dt><dd>Sat 14 Nov, 12:00</dd></div>
+            <div><dt>Entry</dt><dd>Free</dd></div>
           </dl>
         </div>
         <RegisterForm navigate={navigate} />
@@ -898,21 +1285,20 @@ const ColleagueZeroPage = ({ navigate }) => {
               Can an agent pass as a <span className="cz-h1-accent">colleague?</span>
             </h1>
             <p className="cz-hero-lede">
-              Build the first hire at our academy who isn't a person. Then watch it work, live,
-              in front of everyone.
+              Spend 24 hours building a team of AI agents that takes on real work in education.
             </p>
             <div className="cz-hero-cta">
               <a href="#register" className="cz-btn cz-btn--primary" onClick={goRegister}>
                 Register your team <Icon name="arrow-right" size={18} />
               </a>
               <a href="#the-main" className="cz-btn cz-btn--secondary" onClick={scrollToId("the-main")}>
-                Take a look inside
+                See the challenge
               </a>
             </div>
             <dl className="cz-hero-facts">
-              <div><dt>Verdict</dt><dd>Hired <i>or</i> Not hired</dd></div>
-              <div><dt>Lifelines</dt><dd>5</dd></div>
-              <div><dt>Date</dt><dd>{EVENT.dateShort || "Announcing soon"}</dd></div>
+              <div><dt>Verdict</dt><dd>Hired <i>or</i> not hired</dd></div>
+              <div><dt>Max team</dt><dd>5</dd></div>
+              <div><dt>Starts</dt><dd>Fri 13 Nov, 11:00</dd></div>
             </dl>
           </div>
           <div className="cz-hero-stage">
@@ -921,16 +1307,7 @@ const ColleagueZeroPage = ({ navigate }) => {
         </div>
       </section>
 
-      <div className="cz-ticker" aria-hidden="true">
-        <div className="cz-ticker-track">
-          {[0, 1].map((k) => (
-            <span key={k}>
-              read_inbox() <b>·</b> lookup_student() <b>·</b> check_timetable() <b>·</b> book_room() <b>·</b>{" "}
-              send_message() <b>·</b> submit_plan() <b>·</b> escalate() <b>·</b> Hired <b>·</b> Not hired <b>·</b>{" "}
-            </span>
-          ))}
-        </div>
-      </div>
+      <Ticker />
 
       <Manifesto />
       <Challenge />
@@ -975,7 +1352,7 @@ export const ColleagueZeroRegisteredPage = ({ navigate }) => {
   }, []);
 
   const steps = [
-    { t: "Application received", v: reg?.email ? `We'll write to ${reg.email}.` : "You're on the list.", done: true },
+    { t: "Registered", v: reg?.teamSize === "1" ? "You're registered for Colleague Zero." : "Your team is registered for Colleague Zero.", done: true },
     ...SCHEDULE.map((s) => ({ t: s.t, v: `${s.day}, ${s.time} · ${s.where}` })),
   ];
 
@@ -988,14 +1365,14 @@ export const ColleagueZeroRegisteredPage = ({ navigate }) => {
           <div className="cz-done-copy">
             <p className="cz-kicker cz-mono">
               <span className="cz-live-dot" aria-hidden="true" />
-              Application received
+              Registered
             </p>
             <h1>
-              {reg?.teamName ? <>{reg.teamName}, you're on the <span className="cz-h1-accent">shortlist.</span></> : <>You're on the <span className="cz-h1-accent">shortlist.</span></>}
+              {reg?.teamName ? <>{reg.teamName}, you're <span className="cz-h1-accent">in.</span></> : <>You're <span className="cz-h1-accent">in.</span></>}
             </h1>
             <p className="cz-hero-lede">
-              Your colleague's first day hasn't started yet. Keep an eye on your inbox: we'll be in
-              touch before the hackathon starts at 11:00 on Friday, 13 November.
+              {reg?.teamSize === "1" ? "You're" : "Your team is"} registered for Colleague Zero. We'll see
+              you online at 11:00 on Friday 13 November.
             </p>
             <div className="cz-hero-cta">
               <a
@@ -1027,7 +1404,7 @@ export const ColleagueZeroRegisteredPage = ({ navigate }) => {
       <section className="cz-section">
         <div className="cz-wrap">
           <Eyebrow n="→">What happens next</Eyebrow>
-          <h2 className="cz-h2">From shortlist to presentation.</h2>
+          <h2 className="cz-h2">From registration to presentation.</h2>
           <ol className="cz-timeline">
             {steps.map((s, i) => (
               <li key={s.t} className={s.done ? "is-done" : ""}>

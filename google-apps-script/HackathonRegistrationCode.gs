@@ -111,17 +111,16 @@ function sendConfirmationEmail_(d) {
 
   var solo = d.joiningAs === "Individual";
   var who = solo ? "You're" : "<strong>" + esc_(d.teamName) + "</strong> is";
+  var whoLower = solo ? "you" : "your team";
   var team = solo
     ? "Joining as an individual"
     : esc_(d.teamName) + " · " + esc_(d.teamSize || "?") + " people";
-  var inPerson = d.inPerson === "Yes"
-    ? (solo ? "You'll" : "Your team will") + " join day two in person."
-    : "Day two is in person at the Melsoft offices, if you can make it.";
+  var inPerson = "We'll see " + whoLower + " online at 11:00 on Friday 13 November, and at the Melsoft offices from 09:00 on Saturday 14 November.";
 
   var htmlBody = "" +
     "<div style=\"font-family:Inter,Arial,sans-serif;font-size:15px;line-height:1.6;color:#0a1733;max-width:560px\">" +
     "<p>Hi " + esc_(name) + ",</p>" +
-    "<p>" + who + " on the shortlist for Colleague Zero, the autonomous agent hackathon.</p>" +
+    "<p>" + who + " registered for Colleague Zero, the autonomous agent hackathon.</p>" +
     "<div style=\"border:1px solid #e5e8f0;border-left:4px solid #5e0743;border-radius:12px;padding:16px 18px;margin:16px 0\">" +
     "<div style=\"font-size:18px;font-weight:700\">Colleague Zero</div>" +
     when + where +
@@ -137,7 +136,7 @@ function sendConfirmationEmail_(d) {
     to: d.email,
     replyTo: CONFIG.REPLY_TO,
     name: CONFIG.SENDER_NAME,
-    subject: "You're on the shortlist: Colleague Zero" + (d.teamName ? " · " + d.teamName : ""),
+    subject: "You're in: Colleague Zero" + (d.teamName ? " · " + d.teamName : ""),
     htmlBody: htmlBody,
   });
 }
