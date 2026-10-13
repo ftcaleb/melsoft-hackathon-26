@@ -61,8 +61,9 @@
 .cz-center { text-align: center; margin-left: auto; margin-right: auto; }
 .cz-note { margin-top: 28px; color: var(--text-3); }
 
-.cz-section { padding: 140px 0; position: relative; }
-.cz-section--tight { padding: 100px 0; }
+/* No top padding: each section is spaced from the next by its bottom padding only. */
+.cz-section { padding: 0 0 140px; position: relative; }
+.cz-section--tight { padding: 0 0 100px; }
 
 /* ── Buttons (match .btn-primary / .btn-secondary in index.css) ── */
 .cz-btn {
@@ -158,6 +159,8 @@
   text-wrap: balance;
 }
 .cz-h1-accent { color: var(--cz-maroon); }
+/* Main hero headline: sized to sit on two lines. */
+.cz-hero h1 { font-size: clamp(30px, 4.1vw, 60px); }
 .cz-hero-lede { margin-top: 30px; max-width: 520px; font-size: 18px; line-height: 1.6; color: var(--text-2); }
 .cz-hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
 .cz-hero-facts { display: flex; flex-wrap: wrap; margin: 44px 0 0; border-top: 1px solid var(--line-2); }
@@ -246,6 +249,313 @@
 .cz-flight { animation: czFly 0.9s var(--cz-ease) forwards; }
 @keyframes czFly { 0% { transform: translate(0, 0); opacity: 1; } 45% { transform: translate(calc(var(--fx) * 0.5), calc(var(--fy) * 0.5 - 40px)); } 100% { transform: translate(var(--fx), var(--fy)); opacity: 0; } }
 
+/* ── 06 The show: a stage screen and a ticket ── */
+.cz-show-head { text-align: center; }
+.cz-show-head .cz-eyebrow { justify-content: center; }
+.cz-stage { position: relative; max-width: 980px; margin: 48px auto 0; padding: 40px 0 70px; perspective: 1600px; }
+/* A soft spotlight falling on the screen from above. */
+.cz-stage-beam {
+  position: absolute; left: 50%; top: -60px; width: 760px; height: 620px; transform: translateX(-50%); pointer-events: none;
+  background: conic-gradient(from 180deg at 50% 0%, transparent 155deg, rgba(255, 255, 255, 0.95) 172deg, rgba(255, 255, 255, 0.95) 188deg, transparent 205deg);
+  filter: blur(18px); opacity: 0.9;
+  -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent 95%); mask-image: linear-gradient(180deg, #000 40%, transparent 95%);
+}
+.cz-stage-float {
+  position: relative; width: min(100%, 820px); margin: 0 auto; transform-style: preserve-3d;
+  transform: rotateX(calc(8deg - var(--py, 0) * 6deg)) rotateY(calc(var(--px, 0) * 9deg));
+  animation: czStageBob 7s ease-in-out infinite;
+}
+@keyframes czStageBob { 50% { translate: 0 -10px; } }
+.cz-stage-screen {
+  position: relative; aspect-ratio: 16 / 10; border-radius: 28px; overflow: hidden;
+  background:
+    radial-gradient(55% 60% at 50% 45%, rgba(90, 108, 158, 0.5), transparent 70%),
+    linear-gradient(180deg, #13224a, #071027);
+  border: 10px solid #0b1430;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 70px 120px -50px rgba(10, 23, 51, 0.7), 0 30px 50px -30px rgba(10, 23, 51, 0.45);
+}
+/* A faint grid on the screen, like the page. */
+.cz-stage-screen::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+/* Glass reflection across the top of the screen. */
+.cz-stage-screen::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 38%);
+}
+.cz-stage-live {
+  position: absolute; left: 22px; top: 18px; z-index: 2; display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 12px; border-radius: 100px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #fff;
+}
+.cz-stage-live .cz-live-dot { background: #e2559f; }
+.cz-stage-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cz-stage-ring { fill: none; stroke: rgba(185, 195, 222, 0.22); stroke-width: 1.5; stroke-dasharray: 3 7; }
+.cz-stage-trail { fill: none; stroke: #e2559f; stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 0.16 0.84; stroke-dashoffset: 0.16; animation: czStageTrail var(--loop) linear infinite; opacity: 0.8; }
+@keyframes czStageTrail { to { stroke-dashoffset: -0.84; } }
+.cz-stage-orb { fill: #fff; filter: drop-shadow(0 0 8px rgba(226, 85, 159, 0.9)); }
+.cz-stage-node { fill: #0f1d42; stroke: rgba(185, 195, 222, 0.35); stroke-width: 1.5; animation: czStageNode var(--loop) linear infinite; animation-delay: var(--d); }
+.cz-stage-t { font-size: 15px; font-weight: 700; letter-spacing: 0.04em; fill: rgba(238, 241, 248, 0.55); animation: czStageText var(--loop) linear infinite; animation-delay: var(--d); }
+.cz-stage-tick { fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+/* Each step lights as the light reaches it. */
+@keyframes czStageNode { 0%, 18% { fill: var(--cz-maroon-2); stroke: #e2559f; } 26%, 100% { fill: #0f1d42; stroke: rgba(185, 195, 222, 0.35); } }
+@keyframes czStageText { 0%, 18% { fill: #fff; } 26%, 100% { fill: rgba(238, 241, 248, 0.55); } }
+.cz-stage-svg .cz-crew-botshadow { display: none; }
+/* The ticket: engraved card, perforated stub. */
+.cz-ticket {
+  position: absolute; right: -28px; bottom: -44px; z-index: 3; display: flex;
+  transform: rotate(-6deg) translateZ(60px);
+  filter: drop-shadow(0 26px 30px rgba(10, 23, 51, 0.35));
+}
+.cz-ticket-main, .cz-ticket-stub { background: linear-gradient(160deg, #ffffff, #eef1f7); }
+.cz-ticket-main { display: flex; flex-direction: column; gap: 4px; padding: 18px 22px 18px 24px; border-radius: 16px 0 0 16px; }
+.cz-ticket-k { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cz-maroon); }
+.cz-ticket-main strong { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); white-space: nowrap; }
+.cz-ticket-where { font-size: 13px; font-weight: 600; color: var(--text-3); }
+.cz-ticket-stub {
+  position: relative; width: 62px; border-radius: 0 16px 16px 0;
+  border-left: 2px dashed var(--line-2);
+  -webkit-mask: radial-gradient(circle 8px at 0 0, transparent 98%, #000) top / 100% 51% no-repeat, radial-gradient(circle 8px at 0 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
+  mask: radial-gradient(circle 8px at 0 0, transparent 98%, #000) top / 100% 51% no-repeat, radial-gradient(circle 8px at 0 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
+}
+.cz-ticket-stub i { position: absolute; inset: 16px 20px; background: repeating-linear-gradient(180deg, var(--ink) 0 2px, transparent 2px 4px, var(--ink) 4px 5px, transparent 5px 8px); opacity: 0.8; }
+@media (max-width: 860px) {
+  .cz-stage { padding-bottom: 90px; }
+  .cz-stage-screen { border-width: 6px; border-radius: 20px; }
+  .cz-stage-t { font-size: 20px; }
+  .cz-ticket { right: 50%; bottom: -60px; transform: translateX(50%) rotate(-4deg); }
+  .cz-ticket-main strong { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cz-stage-float, .cz-stage-trail, .cz-stage-node, .cz-stage-t { animation: none; }
+  .cz-stage-orb { display: none; }
+}
+
+/* ── 07 Teams: a roster card at a fixed 3D angle ── */
+.cz-teams-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 72px; align-items: center; }
+.cz-roster { position: relative; perspective: 1600px; padding: 30px 0 60px; }
+/* The pose: tipped back and turned, held still. The stacked shadows draw
+   the slab edge, so it reads as a thick card rather than a flat panel. */
+.cz-roster-card {
+  position: relative; z-index: 1; padding: 26px 28px 24px; border-radius: 28px;
+  background: linear-gradient(150deg, #ffffff 0%, #f6f8fc 60%, #edf0f7 100%);
+  border: 1px solid rgba(10, 23, 51, 0.06);
+  transform: rotateX(10deg) rotateY(-8deg);
+  transform-style: preserve-3d;
+  box-shadow:
+    0 1.5px 0 #fff inset,
+    1px 1px 0 #e3e7f0, 2px 2px 0 #dfe3ec, 3px 3px 0 #dbe0ea, 4px 4px 0 #d7dce7,
+    5px 5px 0 #d3d9e5, 6px 6px 0 #cfd5e2, 7px 7px 0 #cbd2df, 8px 8px 0 #c7cedc,
+    30px 50px 60px -20px rgba(10, 23, 51, 0.35);
+}
+/* Ground shadow, skewed to match the angle. */
+.cz-roster-shadow {
+  position: absolute; left: 10%; right: 6%; bottom: 10px; height: 46px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(10, 23, 51, 0.2), transparent);
+  transform: skewX(-10deg); filter: blur(6px);
+}
+.cz-roster-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cz-roster-k { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+.cz-roster-k svg { color: var(--cz-maroon); }
+/* Solo / Team switch. */
+.cz-roster-switch { display: inline-flex; padding: 4px; border-radius: 100px; background: var(--surface-2); box-shadow: inset 0 1px 2px rgba(10, 23, 51, 0.08); }
+.cz-roster-switch button {
+  border: 0; background: transparent; cursor: pointer; padding: 7px 14px; border-radius: 100px;
+  font: inherit; font-size: 13px; font-weight: 700; color: var(--text-2);
+  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+.cz-roster-switch button.is-on { background: #fff; color: var(--ink); box-shadow: 0 4px 10px -4px rgba(10, 23, 51, 0.3); }
+.cz-roster-switch button:focus-visible { outline: 2px solid var(--cz-maroon); outline-offset: 2px; }
+/* The seats stand off the card face. */
+.cz-roster-seats { position: relative; margin: 36px 0 8px; transform: translateZ(26px); transform-style: preserve-3d; }
+.cz-roster-seats ul { position: relative; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.cz-roster-seats li { display: flex; justify-content: center; transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease; }
+/* The line joining the seat centres (avatars are 72px, centre at 36px). */
+.cz-roster-link { position: absolute; left: 10%; right: 10%; top: 35px; height: 0; border-top: 2px dashed var(--line-2); transform-origin: left center; transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease; }
+.cz-roster-av {
+  position: relative; z-index: 1; display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%;
+  font-size: 15px; font-weight: 800; letter-spacing: 0.06em; color: #fff;
+  border: 4px solid #fff;
+  box-shadow: 0 2px 0 rgba(255, 255, 255, 0.6) inset, 4px 8px 0 -2px rgba(10, 23, 51, 0.1), 10px 18px 24px -10px rgba(10, 23, 51, 0.45);
+}
+.cz-roster-seats li.is-navy .cz-roster-av { background: linear-gradient(160deg, #2a3c6e, #0a1733); }
+.cz-roster-seats li.is-slate .cz-roster-av { background: linear-gradient(160deg, #5a6c9e, #33467c); }
+.cz-roster-seats li.is-maroon .cz-roster-av { background: linear-gradient(160deg, #a11a72, #5e0743); }
+.cz-roster-seats li.is-pale .cz-roster-av { background: linear-gradient(160deg, #ffffff, #e3e8f2); color: var(--ink); }
+.cz-roster-seats li.is-open .cz-roster-av { background: rgba(255, 255, 255, 0.7); color: var(--cz-maroon); border: 2px dashed rgba(94, 7, 67, 0.45); box-shadow: none; }
+/* Solo: the team folds back into the first seat, which moves to the centre. */
+.cz-roster.is-solo .cz-roster-seats li:not(:first-child) { opacity: 0; transform: translateX(calc(var(--i) * -40%)) scale(0.6); pointer-events: none; }
+.cz-roster.is-solo .cz-roster-link { transform: scaleX(0); opacity: 0; }
+.cz-roster.is-solo .cz-roster-seats li:first-child { transform: translateX(200%); }
+.cz-roster-foot { margin-top: 26px; padding-top: 18px; border-top: 1px dashed var(--line-2); text-align: center; font-size: 14px; font-weight: 700; color: var(--ink); }
+@media (max-width: 1100px) {
+  .cz-teams-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+@media (max-width: 600px) {
+  .cz-roster-card { padding: 20px 16px 18px; border-radius: 22px; transform: rotateX(8deg) rotateY(-5deg); }
+  .cz-roster-av { width: 52px; height: 52px; font-size: 12px; border-width: 3px; }
+  .cz-roster-link { top: 25px; }
+}
+
+/* ── Ideas on a dark band ── */
+/* Full-width navy with the page grid in faint white. Maroon is too dark on
+   navy, so the accents step up to a lighter rose. */
+.cz-section.is-dark {
+  --dk-accent: #e46aa8;
+  padding: 120px 0;
+  background-color: var(--ink);
+  background-image:
+    radial-gradient(60% 70% at 80% 0%, rgba(122, 18, 89, 0.35), transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: auto, 44px 44px, 44px 44px;
+  color: #fff;
+}
+.cz-section.is-dark .cz-eyebrow { color: var(--dk-accent); }
+.cz-section.is-dark .cz-twist-line { color: #fff; }
+.cz-section.is-dark .cz-rotator > span[aria-hidden] { color: var(--dk-accent); }
+.cz-section.is-dark .cz-lede { color: rgba(238, 241, 248, 0.72); }
+.cz-section.is-dark .cz-ideas li::before { background: rgba(255, 255, 255, 0.16); }
+.cz-section.is-dark .cz-idea-bar { background: var(--dk-accent); }
+.cz-section.is-dark .cz-idea-n { -webkit-text-stroke-color: rgba(255, 255, 255, 0.32); }
+.cz-section.is-dark .cz-ideas h3 { color: #fff; }
+.cz-section.is-dark .cz-ideas p { color: rgba(238, 241, 248, 0.62); }
+.cz-section.is-dark .cz-ideas li.is-on .cz-idea-n { color: var(--dk-accent); -webkit-text-stroke-color: var(--dk-accent); }
+.cz-section.is-dark .cz-ideas li.is-on h3 { color: var(--dk-accent); }
+.cz-section.is-dark .cz-ideas li.is-on p { color: rgba(238, 241, 248, 0.9); }
+.cz-section.is-dark .cz-ideas li:focus-visible .cz-idea-n { -webkit-text-stroke-color: var(--dk-accent); }
+.cz-section.is-dark .cz-ideas li.is-own::before { border-top-color: rgba(255, 255, 255, 0.28); background: none; }
+.cz-section.is-dark .cz-ideas li.is-own .cz-idea-n { -webkit-text-stroke-color: var(--dk-accent); opacity: 0.7; }
+@media (max-width: 860px) {
+  .cz-section.is-dark { padding: 80px 0; }
+}
+
+/* ── Registration details: one strip under the badge and form ── */
+.cz-glance { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); margin: 64px 0 0; border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); }
+.cz-glance > div { padding: 20px 18px; }
+.cz-glance > div + div { border-left: 1px solid var(--line-2); }
+.cz-glance > div:first-child { padding-left: 0; }
+.cz-glance dt { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
+.cz-glance dd { margin: 8px 0 0; font-size: 15px; font-weight: 700; line-height: 1.35; color: var(--ink); }
+.cz-glance .is-entry dd { color: var(--cz-maroon); font-size: 22px; font-weight: 800; letter-spacing: -0.01em; }
+@media (max-width: 1100px) {
+  .cz-glance { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cz-glance > div:nth-child(4) { border-left: 0; padding-left: 0; }
+  .cz-glance > div:nth-child(n + 4) { border-top: 1px solid var(--line-2); }
+}
+@media (max-width: 600px) {
+  .cz-glance { grid-template-columns: 1fr 1fr; }
+  .cz-glance > div { padding: 16px 12px; }
+  .cz-glance > div:nth-child(odd) { border-left: 0; padding-left: 0; }
+  .cz-glance > div:nth-child(4) { border-left: 1px solid var(--line-2); padding-left: 12px; }
+  .cz-glance > div:nth-child(n + 3) { border-top: 1px solid var(--line-2); }
+}
+
+/* ── Hero video ── */
+.cz-hvid { position: relative; width: 100%; max-width: 680px; margin: 0 auto; animation: czHvidFloat 7s ease-in-out infinite; }
+@keyframes czHvidFloat { 50% { transform: translateY(-8px); } }
+.cz-hvid-frame {
+  position: relative; border-radius: 24px; overflow: hidden; background: #fff;
+  border: 1px solid rgba(10, 23, 51, 0.08);
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.7), 0 50px 90px -40px rgba(10, 23, 51, 0.45), 0 20px 40px -28px rgba(10, 23, 51, 0.3);
+}
+.cz-hvid video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.cz-hvid-sound {
+  position: absolute; right: 14px; bottom: 14px; display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
+  border: 0; border-radius: 50%; cursor: pointer; color: #fff;
+  background: rgba(10, 23, 51, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 8px 20px -8px rgba(10, 23, 51, 0.6); transition: transform 0.15s ease, background 0.15s ease;
+}
+.cz-hvid-sound:hover { transform: scale(1.06); background: var(--ink); }
+.cz-hvid-sound:focus-visible { outline: 2px solid #fff; outline-offset: 2px; box-shadow: 0 0 0 5px var(--cz-maroon); }
+.cz-hvid-sound svg { width: 20px; height: 20px; fill: #fff; }
+.cz-hvid-sound svg .s { fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; }
+@media (prefers-reduced-motion: reduce) { .cz-hvid { animation: none; } }
+/* Desktop: sit the video higher, level with the headline. */
+@media (min-width: 1101px) { .cz-hvid { margin-top: -70px; } }
+/* The badge in the registration column: no hero-sized height. */
+.cz-vacancy .cz-hire { height: 540px; margin-top: 64px; }
+
+/* ── Hero figure: the hire badge (ColleagueZeroBadge.jsx) ── */
+.cz-hire { position: relative; width: 100%; max-width: 420px; height: 560px; margin: 0 auto; }
+.cz-hire-strap { position: absolute; left: 50%; top: -40px; width: 320px; height: 120px; transform: translateX(-50%); overflow: visible; }
+.cz-hire-strap path { fill: none; stroke: url(#czh-strap); stroke-width: 15; stroke-linecap: round; filter: drop-shadow(0 6px 8px rgba(94, 7, 67, 0.25)); }
+/* The badge swings from the clip like a pendulum, and bobs. */
+.cz-hire-swing {
+  position: absolute; left: 50%; top: 68px; width: 300px; margin-left: -150px;
+  transform-origin: 50% 0; perspective: 1100px;
+  animation: czHireSway 7s ease-in-out infinite;
+}
+@keyframes czHireSway {
+  0%, 100% { transform: rotate(-2.4deg) translateY(0); }
+  50% { transform: rotate(2.4deg) translateY(-8px); }
+}
+.cz-hire-clip { position: absolute; left: 50%; top: -22px; z-index: 3; width: 34px; height: 30px; margin-left: -17px; border-radius: 8px; background: linear-gradient(180deg, #33467c, #0a1733); box-shadow: 0 6px 12px -4px rgba(10, 23, 51, 0.5), 0 1px 0 rgba(255, 255, 255, 0.25) inset; }
+.cz-hire-clip i { position: absolute; left: 50%; bottom: -12px; width: 12px; height: 16px; margin-left: -6px; border-radius: 3px; border: 2.5px solid #9aa6c6; border-top: 0; }
+.cz-hire-card {
+  position: relative; z-index: 2; padding: 26px 22px 20px; border-radius: 26px;
+  background: linear-gradient(160deg, #ffffff 0%, #f5f7fb 55%, #e8ecf4 100%);
+  border: 1px solid rgba(10, 23, 51, 0.08);
+  box-shadow: 0 1.5px 0 #fff inset, 0 50px 80px -42px rgba(10, 23, 51, 0.55), 0 18px 30px -24px rgba(10, 23, 51, 0.35);
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d;
+  overflow: hidden;
+}
+.cz-hire-card.is-back {
+  position: absolute; inset: 0; z-index: 1; padding: 0;
+  transform: translate(26px, 18px) rotate(7deg); background: linear-gradient(160deg, #eef1f7, #dfe4ee);
+  box-shadow: 0 30px 50px -36px rgba(10, 23, 51, 0.45); opacity: 0.85;
+}
+.cz-hire-slot { position: absolute; left: 50%; top: 10px; width: 52px; height: 8px; margin-left: -26px; border-radius: 6px; background: #d3d9e6; box-shadow: inset 0 1.5px 2px rgba(10, 23, 51, 0.25); }
+.cz-hire-top { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+.cz-hire-top img { height: 26px; width: auto; display: block; }
+.cz-hire-live { display: inline-flex; padding: 6px; border-radius: 50%; background: rgba(94, 7, 67, 0.08); }
+.cz-hire-portrait {
+  position: relative; margin-top: 16px; height: 210px; border-radius: 18px; overflow: hidden;
+  background:
+    radial-gradient(70% 60% at 50% 35%, rgba(90, 108, 158, 0.55), transparent 70%),
+    linear-gradient(180deg, #13224a, #081230);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+/* A faint grid in the portrait window, like the page. */
+.cz-hire-portrait::before {
+  content: ""; position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.cz-hire-portrait svg { position: absolute; left: 50%; bottom: -6px; width: 210px; height: auto; transform: translateX(-50%); overflow: visible; }
+/* The android in the portrait blinks now and then. */
+.cz-hire-portrait .cz-crew-eye { transform-box: fill-box; transform-origin: center; animation: czHireBlink 4.6s infinite; }
+@keyframes czHireBlink { 0%, 93%, 100% { transform: none; } 95% { transform: scaleY(0.12); } }
+.cz-hire-portrait .cz-crew-botshadow { display: none; }
+.cz-hire-name { margin-top: 18px; font-size: 25px; font-weight: 800; letter-spacing: -0.025em; color: var(--ink); }
+.cz-hire-role { margin-top: 2px; font-size: 14px; font-weight: 600; color: var(--cz-maroon); }
+.cz-hire-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line-2); font-size: 13px; font-weight: 700; color: var(--ink); }
+.cz-hire-code { width: 78px; height: 22px; background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 4px, var(--ink) 4px 5px, transparent 5px 8px, var(--ink) 8px 11px, transparent 11px 13px); opacity: 0.85; }
+/* Light sliding across the face as it tilts. */
+.cz-hire-glare {
+  position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: radial-gradient(60% 45% at var(--gx, 50%) var(--gy, 30%), rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 70%);
+  mix-blend-mode: soft-light;
+}
+/* The shadow on the ground breathes with the bob. */
+.cz-hire-shadow {
+  position: absolute; left: 50%; bottom: 6px; width: 240px; height: 26px; margin-left: -120px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(10, 23, 51, 0.22), transparent);
+  animation: czHireShadow 7s ease-in-out infinite;
+}
+@keyframes czHireShadow { 50% { transform: scale(0.86); opacity: 0.7; } }
+@media (max-width: 600px) {
+  .cz-hire { height: 500px; max-width: 340px; }
+  .cz-hire-swing { width: 270px; margin-left: -135px; }
+  .cz-hire-portrait { height: 180px; }
+  .cz-hire-portrait svg { width: 168px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cz-hire-swing, .cz-hire-shadow, .cz-hire-portrait .cz-crew-eye { animation: none; }
+}
+
 /* ── Hero figure: the crew (ColleagueZeroCrew.jsx) ── */
 .cz-crew { position: relative; width: 100%; max-width: 640px; margin: 0 auto; }
 .cz-crew-svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 30px 40px rgba(10, 23, 51, 0.1)); }
@@ -288,16 +598,15 @@
 .cz-crew-botshadow { fill: rgba(10, 23, 51, 0.16); }
 .cz-crew-lift { transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
 .cz-crew-bot.is-on .cz-crew-lift { transform: translateY(-5px); }
-.cz-crew-limb { fill: #2a3c6e; }
-.cz-crew-hand { fill: #1c2b55; }
-.cz-crew-core { fill: #b9c3de; opacity: 0.5; transition: opacity 0.3s ease; }
-.cz-crew-bot.is-on .cz-crew-core { opacity: 1; filter: drop-shadow(0 0 3px rgba(185, 195, 222, 0.9)); }
-.cz-crew-antenna { stroke: #1c2b55; stroke-width: 1.4; stroke-linecap: round; }
-.cz-crew-bulb { fill: #5a6c9e; transition: fill 0.3s ease; }
-.cz-crew-bot.is-on .cz-crew-bulb { fill: var(--cz-maroon); filter: drop-shadow(0 0 3px rgba(122, 18, 89, 0.7)); }
-.cz-crew-gloss { fill: none; stroke: rgba(238, 241, 248, 0.35); stroke-width: 1; stroke-linecap: round; }
-.cz-crew-eye { fill: #b9c3de; transition: fill 0.3s ease; }
-.cz-crew-bot.is-on .cz-crew-eye { fill: #eef1f8; filter: drop-shadow(0 0 1.6px rgba(238, 241, 248, 0.9)); }
+.cz-crew-shell { stroke: rgba(10, 23, 51, 0.1); stroke-width: 0.5; }
+.cz-crew-spec { fill: #fff; opacity: 0.75; }
+.cz-crew-gloss { fill: none; stroke: rgba(238, 241, 248, 0.4); stroke-width: 0.8; stroke-linecap: round; }
+.cz-crew-halo { fill: none; stroke-width: 2; stroke-linecap: round; opacity: 0.55; transition: opacity 0.3s ease; }
+.cz-crew-halo.is-back { opacity: 0.3; }
+.cz-crew-bot.is-on .cz-crew-halo { opacity: 1; filter: drop-shadow(0 0 2.5px rgba(192, 57, 127, 0.6)); }
+.cz-crew-bot.is-on .cz-crew-halo.is-back { opacity: 0.5; }
+.cz-crew-eye { fill: #8f9cc4; transition: fill 0.3s ease; }
+.cz-crew-bot.is-on .cz-crew-eye { fill: #dfe7ff; filter: drop-shadow(0 0 1.8px rgba(170, 195, 255, 0.95)); }
 /* The document, gliding between stations. */
 .cz-crew-doc { transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1); }
 .cz-crew-doc.is-reset { transition: none; }
@@ -310,53 +619,24 @@
 .cz-crew-badge.is-fixed circle { fill: var(--ink); }
 .cz-crew-badge text { font-size: 10px; font-weight: 800; fill: #fff; text-anchor: middle; }
 
-/* ── 02 The challenge: three little scenes (ChallengeScene) ── */
-.cz-x { list-style: none; margin: 56px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line-2); }
-.cz-x > li { position: relative; padding: 32px 28px 8px; }
-.cz-x > li + li { border-left: 1px solid var(--line-2); }
-/* The one that counts: a maroon rule on top and a soft tint fading down. */
-.cz-x > li.is-ok { background: linear-gradient(180deg, rgba(94, 7, 67, 0.06), transparent 75%); }
-.cz-x > li.is-ok::before { content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 2px; background: var(--cz-maroon); }
-.cz-x-art { display: block; width: 100%; max-width: 260px; height: auto; margin: 0 auto; overflow: visible; }
-.cz-x > li:not(.is-ok) .cz-x-art { filter: saturate(0.4); opacity: 0.75; }
-.cz-x-floor { fill: rgba(10, 23, 51, 0.07); filter: blur(3px); }
-.cz-x-text { display: flex; gap: 14px; align-items: flex-start; margin-top: 22px; }
-.cz-x-mark {
-  flex-shrink: 0; display: grid; place-items: center; width: 28px; height: 28px; margin-top: 1px; border-radius: 50%;
-  font-size: 13px; font-weight: 800; color: var(--text-3); border: 1.5px solid var(--line-2);
+/* ── 02 The challenge: three words ── */
+.cz-words { list-style: none; margin: 64px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; }
+.cz-words li { padding-top: 24px; border-top: 1px solid var(--line-2); }
+.cz-words li.is-ok { border-top: 2px solid var(--cz-maroon); padding-top: 23px; }
+.cz-words-w { position: relative; display: inline-block; font-size: clamp(40px, 4.6vw, 68px); font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: #b3bacb; }
+.cz-words li.is-ok .cz-words-w { color: var(--cz-maroon); }
+/* The strike (and, for the last word, the underline), drawn in turn. */
+.cz-words-w i {
+  position: absolute; left: -3%; right: -3%; top: 54%; height: 0.075em; border-radius: 0.04em;
+  background: var(--text-3); transform: scaleX(0); transform-origin: left;
+  transition: transform 0.55s cubic-bezier(0.65, 0, 0.35, 1); transition-delay: calc(0.2s + var(--i) * 0.45s);
 }
-.cz-x-mark.is-ok { color: #fff; background: var(--cz-maroon); border-color: var(--cz-maroon); }
-.cz-x h3 { font-size: 21px; color: var(--ink); }
-.cz-x > li:not(.is-ok) h3 { color: var(--text-2); }
-.cz-x p { margin-top: 6px; font-size: 15px; line-height: 1.55; color: var(--text-2); }
-/* Chatbot: a question, then an answer typing. */
-.cz-x-bubble rect { fill: #fff; stroke: var(--line-2); stroke-width: 1.5; }
-.cz-x-bubble text, .cz-x-step text { font-size: 17px; font-weight: 800; text-anchor: middle; fill: var(--text-3); }
-.cz-x-reply rect { fill: #e3e7f0; }
-.cz-x-reply circle { fill: var(--text-3); animation: czXDot 1.2s ease-in-out infinite; }
-.cz-x-reply circle:nth-of-type(2) { animation-delay: 0.15s; }
-.cz-x-reply circle:nth-of-type(3) { animation-delay: 0.3s; }
-@keyframes czXDot { 0%, 60%, 100% { opacity: 0.3; } 30% { opacity: 1; } }
-/* Automation: the same three steps, round and round. */
-.cz-x-step rect { fill: #fff; stroke: var(--line-2); stroke-width: 1.5; }
-.cz-x-link { stroke: var(--line-2); stroke-width: 1.5; stroke-dasharray: 3 4; }
-.cz-x-loop { fill: none; stroke: var(--line-2); stroke-width: 1.5; stroke-dasharray: 3 4; }
-.cz-x-run { fill: var(--text-3); }
-/* Colleague: a goal worked round a loop, ending in a check. */
-.cz-x-ring { fill: rgba(94, 7, 67, 0.04); stroke: rgba(94, 7, 67, 0.3); stroke-width: 1.5; }
-.cz-x-node { fill: #fff; stroke: var(--ink); stroke-width: 2; }
-.cz-x-orb { fill: var(--cz-maroon); filter: drop-shadow(0 0 5px rgba(94, 7, 67, 0.55)); }
-.cz-x-check { fill: none; stroke: var(--cz-maroon); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.cz-words li.is-ok .cz-words-w i { left: 0; right: 0; top: auto; bottom: -0.16em; height: 0.07em; background: var(--cz-maroon); }
+.cz-words.is-in .cz-words-w i { transform: scaleX(1); }
+.cz-words p { margin-top: 22px; max-width: 300px; font-size: 16px; line-height: 1.55; color: var(--text-2); }
+.cz-words li.is-ok p { color: var(--ink); font-weight: 600; }
 @media (max-width: 860px) {
-  .cz-x { grid-template-columns: 1fr; }
-  .cz-x > li { padding: 28px 0 20px; }
-  .cz-x > li + li { border-left: 0; border-top: 1px solid var(--line-2); }
-  .cz-x > li.is-ok { padding: 28px 16px 20px; }
-  .cz-x-art { max-width: 220px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .cz-x-reply circle { animation: none; opacity: 0.6; }
-  .cz-x-run, .cz-x-orb { display: none; }
+  .cz-words { grid-template-columns: 1fr; gap: 28px; margin-top: 44px; }
 }
 
 /* ── Ticker: one row, one speed, no seam ── */
@@ -398,13 +678,6 @@
 }
 .cz-manifesto-text .is-accent { color: var(--cz-maroon); }
 
-.cz-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 80px 0 0; border-top: 1px solid var(--line-2); }
-.cz-stats > div { padding: 20px 24px 0; border-left: 1px solid var(--line-2); }
-.cz-stats > div:first-child { border-left: 0; padding-left: 0; }
-.cz-stats dt { font-family: var(--cz-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); font-weight: 700; }
-.cz-stats dd { margin: 8px 0 0; font-family: var(--cz-serif); font-weight: 700; font-size: clamp(72px, 10vw, 156px); line-height: 0.9; letter-spacing: -0.04em; color: var(--ink); }
-.cz-stats > div:nth-child(2) dd { color: var(--cz-maroon); }
-.cz-stats-cap { margin: 14px 0 0; max-width: 220px; font-size: 14px; line-height: 1.45; color: var(--text-2); }
 .cz-manifesto-lede { margin-top: 32px; max-width: 680px; }
 
 /* ── Split layout: sticky heading beside a ruled list ── */
@@ -926,7 +1199,7 @@
 .cz-think:focus-visible .cz-think-bubble { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--cz-maroon); }
 /* The little colleague (AgentBuddy). Arms and head turn about their own
    joints, so each part sets transform-box and an origin. */
-.cz-buddy { position: relative; display: block; width: 54px; height: 59px; margin-right: 8px; }
+.cz-buddy { position: relative; display: block; width: 54px; height: 68px; margin-right: 8px; }
 /* A soft navy halo behind the character, breathing slowly; it brightens
    while it waves. */
 .cz-buddy::before {
@@ -944,47 +1217,41 @@
 .cz-buddy-bob { animation: czBuddyBob 6s ease-in-out infinite; }
 @keyframes czBuddyBob { 50% { transform: translateY(-3px); } }
 @keyframes czBuddyShadow { 50% { transform: scaleX(0.82); opacity: 0.7; } }
-.cz-buddy-body { fill: url(#czb-body); }
-.cz-buddy-arm-l rect, .cz-buddy-arm-r rect { fill: var(--nv-600); }
-.cz-buddy-hand { fill: var(--nv-700); }
-.cz-buddy-neck { fill: var(--nv-700); }
-.cz-buddy-seam { fill: none; stroke: rgba(238, 241, 248, 0.16); stroke-width: 0.8; stroke-linecap: round; }
-/* The chest core: a small light that breathes with the halo. */
-.cz-buddy-core { fill: var(--nv-200); filter: drop-shadow(0 0 2.5px rgba(185, 195, 222, 0.9)); animation: czBuddyCore 4.5s ease-in-out infinite; }
-@keyframes czBuddyCore { 50% { opacity: 0.55; } }
-.cz-buddy-arm-l { transform-box: view-box; transform-origin: 17.75px 39px; transform: rotate(9deg); }
-/* At rest the raised arm is turned down by the side; waving swings it up
-   and back and forth with a little overshoot, then lowers it again. */
-.cz-buddy-arm-r { transform-box: view-box; transform-origin: 46.25px 39px; transform: rotate(166deg); transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+/* Orb agent: a frosted ceramic sphere, glass visor, maroon halo, floating hands. */
+.cz-buddy-skull { fill: url(#czb-orb); stroke: rgba(10, 23, 51, 0.1); stroke-width: 0.5; }
+.cz-buddy-spec { fill: #fff; opacity: 0.75; }
+.cz-buddy-visor { fill: url(#czb-glass); }
+.cz-buddy-gloss { fill: none; stroke: rgba(238, 241, 248, 0.4); stroke-width: 0.8; stroke-linecap: round; }
+.cz-buddy-halo { fill: none; stroke-width: 2; stroke-linecap: round; filter: drop-shadow(0 0 2px rgba(192, 57, 127, 0.45)); }
+.cz-buddy-halo.is-back { opacity: 0.45; }
+.cz-buddy-spark { fill: #fff; filter: drop-shadow(0 0 2.5px rgba(226, 85, 159, 1)); }
+.cz-buddy-hand { fill: url(#czb-orb); stroke: rgba(10, 23, 51, 0.12); stroke-width: 0.5; }
+/* The left hand drifts on its own; the right one waves. */
+.cz-buddy-arm-l { animation: czBuddyHand 4s ease-in-out infinite; }
+@keyframes czBuddyHand { 50% { transform: translateY(-2.5px); } }
+.cz-buddy-arm-r { transform-box: view-box; transform-origin: 66px 39.5px; transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
 .cz-buddy.is-waving .cz-buddy-arm-r { animation: czBuddyWave 1.45s cubic-bezier(0.37, 0, 0.3, 1); }
+/* Swings out and up in an arc, wiggles, and comes back down. */
 @keyframes czBuddyWave {
-  0% { transform: rotate(166deg); }
-  16% { transform: rotate(-12deg); }
-  30% { transform: rotate(20deg); }
-  44% { transform: rotate(-14deg); }
-  58% { transform: rotate(18deg); }
-  72% { transform: rotate(-6deg); }
-  100% { transform: rotate(166deg); }
+  0% { transform: none; }
+  18% { transform: rotate(96deg); }
+  32% { transform: rotate(80deg); }
+  46% { transform: rotate(98deg); }
+  60% { transform: rotate(82deg); }
+  74% { transform: rotate(93deg); }
+  100% { transform: none; }
 }
-.cz-buddy-head { transform-box: view-box; transform-origin: 32px 34px; transform: rotate(var(--tilt, 0deg)); transition: transform 0.25s ease-out; }
-.cz-buddy-antenna { stroke: var(--nv-700); stroke-width: 1.4; stroke-linecap: round; }
-.cz-buddy-bulb {
-  fill: var(--cz-maroon); transform-box: fill-box; transform-origin: center;
-  filter: drop-shadow(0 0 2px rgba(122, 18, 89, 0.55));
-  animation: czBuddyBulb 1.6s ease-in-out infinite;
-}
-@keyframes czBuddyBulb { 50% { fill: var(--cz-maroon-2); transform: scale(1.15); filter: drop-shadow(0 0 5px rgba(122, 18, 89, 0.85)); } }
-.cz-buddy-ear { fill: var(--nv-600); }
-.cz-buddy-skull { fill: url(#czb-head); }
-/* A hairline of light along the top of the head, and a glint on the visor. */
-.cz-buddy-rim { fill: none; stroke: rgba(238, 241, 248, 0.22); stroke-width: 0.8; stroke-linecap: round; }
-.cz-buddy-visor { fill: url(#czb-visor); }
-.cz-buddy-gloss { fill: none; stroke: rgba(238, 241, 248, 0.35); stroke-width: 1; stroke-linecap: round; }
+.cz-buddy-head { transform-box: view-box; transform-origin: 32px 52px; transform: rotate(var(--tilt, 0deg)); transition: transform 0.25s ease-out; }
 .cz-buddy-eyes { transform: translate(calc(var(--ex, 0px) * 0.7), calc(var(--ey, 0px) * 0.7)); transition: transform 0.18s ease-out; }
-.cz-buddy-eye { fill: var(--nv-50); filter: drop-shadow(0 0 1.6px rgba(185, 195, 222, 0.9)); transform-box: fill-box; transform-origin: center; transition: transform 0.08s ease, opacity 0.15s ease; }
+.cz-buddy-eye { fill: #dfe7ff; filter: drop-shadow(0 0 1.8px rgba(170, 195, 255, 0.95)); transform-box: fill-box; transform-origin: center; transition: transform 0.08s ease, opacity 0.15s ease; }
 .cz-buddy.is-blink .cz-buddy-eye { transform: scaleY(0.12); }
+/* Wink: the right eye closes into a curve, a smile, a little head tilt. */
+.cz-buddy-wink { fill: none; stroke: var(--nv-50); stroke-width: 1.4; stroke-linecap: round; opacity: 0; transition: opacity 0.12s ease; }
+.cz-buddy.is-wink .cz-buddy-eye.is-right { opacity: 0; }
+.cz-buddy.is-wink .cz-buddy-wink, .cz-buddy.is-wink .cz-buddy-smile { opacity: 1; }
+.cz-buddy.is-wink .cz-buddy-head { transform: rotate(calc(var(--tilt, 0deg) - 7deg)); }
 .cz-buddy-happy { fill: none; stroke: var(--nv-50); stroke-width: 1.4; stroke-linecap: round; opacity: 0; transition: opacity 0.15s ease; }
-.cz-buddy-smile { fill: none; stroke: var(--nv-200); stroke-width: 1.1; stroke-linecap: round; opacity: 0; transition: opacity 0.2s ease; }
+.cz-buddy-smile { fill: none; stroke: #dfe7ff; stroke-width: 1.1; stroke-linecap: round; opacity: 0; transition: opacity 0.2s ease; }
 /* While waving: happy eyes and a small smile. */
 .cz-buddy.is-waving .cz-buddy-eye { opacity: 0; }
 .cz-buddy.is-waving .cz-buddy-happy, .cz-buddy.is-waving .cz-buddy-smile { opacity: 1; }
@@ -1009,14 +1276,11 @@
   .cz-wrap { padding: 0 24px; }
   .cz-header { padding: 12px 16px; }
   .cz-header-pill { padding: 8px 8px 8px 20px; gap: 16px; }
-  .cz-section { padding: 96px 0; }
+  .cz-section { padding: 0 0 96px; }
   .cz-manifesto { padding: 104px 0 88px; }
-  .cz-stats { grid-template-columns: 1fr 1fr; margin-top: 64px; }
-  .cz-stats > div:nth-child(3) { border-left: 0; padding-left: 0; }
-  .cz-stats > div:nth-child(n + 3) { padding-top: 28px; }
   .cz-measured-head { grid-template-columns: 1fr; gap: 0; }
   .cz-measured-head .cz-lede { margin-top: 20px; }
-  .cz-section--tight { padding: 52px 0; }
+  .cz-section--tight { padding: 0 0 52px; }
   .cz-places li { grid-template-columns: 32px minmax(0, 1fr); row-gap: 2px; padding: 9px 0; }
   .cz-places-tease { grid-column: 2; font-size: 14px; }
   .cz-dossier li { padding: 10px 0; }
@@ -1067,7 +1331,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cz-think-float, .cz-buddy-bob, .cz-buddy-shadow, .cz-buddy-bulb, .cz-buddy-core, .cz-buddy::before { animation: none; }
+  .cz-think-float, .cz-buddy-bob, .cz-buddy-shadow, .cz-buddy-arm-l, .cz-buddy::before { animation: none; }
+  .cz-buddy-spark { display: none; }
   .cz *, .cz *::before, .cz *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;

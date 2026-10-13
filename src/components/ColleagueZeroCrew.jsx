@@ -56,35 +56,42 @@ function Box({ x, y, z = 0, w, d, h, cls }) {
 export function CrewDefs({ ids = "czc" }) {
   return (
     <defs>
-      <linearGradient id={`${ids}-head`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#2a3c6e" /><stop offset="1" stopColor="#0a1733" /></linearGradient>
-      <linearGradient id={`${ids}-visor`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#24366a" /><stop offset="1" stopColor="#0c1838" /></linearGradient>
-      <linearGradient id={`${ids}-body`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#33467c" /><stop offset="1" stopColor="#1c2b55" /></linearGradient>
+      {/* Frosted ceramic sphere, lit from the top left. */}
+      <radialGradient id={`${ids}-orb`} cx="0.36" cy="0.3" r="0.78">
+        <stop offset="0" stopColor="#ffffff" /><stop offset="0.55" stopColor="#e6eaf3" /><stop offset="1" stopColor="#aab4cc" />
+      </radialGradient>
+      {/* Dark glass for the visor. */}
+      <linearGradient id={`${ids}-glass`} x1="0" y1="0" x2="0.4" y2="1">
+        <stop offset="0" stopColor="#24366a" /><stop offset="0.6" stopColor="#0f1d42" /><stop offset="1" stopColor="#081230" />
+      </linearGradient>
+      {/* The halo: maroon, brighter at the front. */}
+      <linearGradient id={`${ids}-halo`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stopColor="#5e0743" /><stop offset="0.5" stopColor="#c0397f" /><stop offset="1" stopColor="#5e0743" />
+      </linearGradient>
     </defs>
   );
 }
 
-// The robot from the countdown, front-on, standing at (X, Y).
+// The orb agent: a ceramic sphere with a glass visor, a tilted maroon halo
+// and two floating hands. Local box is 64 × 80; its shadow sits at y 75.
+export const ORB_HALO_BACK = "M5 39 A27 7 0 0 1 59 39";
+export const ORB_HALO_FRONT = "M5 39 A27 7 0 0 0 59 39";
+
 export function Bot({ X, Y, on, ids = "czc" }) {
   return (
-    <g className={"cz-crew-bot" + (on ? " is-on" : "")} transform={`translate(${X - 32} ${Y - 70})`}>
-      <ellipse cx="32" cy="70" rx="16" ry="3" className="cz-crew-botshadow" />
+    <g className={"cz-crew-bot" + (on ? " is-on" : "")} transform={`translate(${X - 32} ${Y - 75})`}>
+      <ellipse cx="32" cy="75" rx="13" ry="2.4" className="cz-crew-botshadow" />
       <g className="cz-crew-lift">
-        <rect x="15.5" y="38" width="4.5" height="15" rx="2.25" className="cz-crew-limb" />
-        <rect x="44" y="38" width="4.5" height="15" rx="2.25" className="cz-crew-limb" />
-        <circle cx="17.75" cy="54" r="2.6" className="cz-crew-hand" />
-        <circle cx="46.25" cy="54" r="2.6" className="cz-crew-hand" />
-        <rect x="29" y="32.5" width="6" height="4" rx="1.5" className="cz-crew-hand" />
-        <path d="M20 40 Q20 36 24 36 H40 Q44 36 44 40 L42.4 56 Q42 60 38 60 H26 Q22 60 21.6 56 Z" fill={`url(#${ids}-body)`} />
-        <circle cx="32" cy="47" r="2.4" className="cz-crew-core" />
-        <line x1="32" y1="6.5" x2="32" y2="12.5" className="cz-crew-antenna" />
-        <circle cx="32" cy="5" r="2.6" className="cz-crew-bulb" />
-        <rect x="16.5" y="18.5" width="3" height="8" rx="1.5" className="cz-crew-limb" />
-        <rect x="44.5" y="18.5" width="3" height="8" rx="1.5" className="cz-crew-limb" />
-        <rect x="19" y="12" width="26" height="21" rx="9" fill={`url(#${ids}-head)`} />
-        <rect x="21.8" y="16" width="20.4" height="12.5" rx="5.6" fill={`url(#${ids}-visor)`} />
-        <path d="M24.2 18.4 Q26 17.1 29 17.1" className="cz-crew-gloss" />
-        <rect x="26" y="19.6" width="3.2" height="5" rx="1.6" className="cz-crew-eye" />
-        <rect x="34.8" y="19.6" width="3.2" height="5" rx="1.6" className="cz-crew-eye" />
+        <path d={ORB_HALO_BACK} transform="rotate(-14 32 39)" className="cz-crew-halo is-back" stroke={`url(#${ids}-halo)`} />
+        <circle cx="32" cy="34" r="18" fill={`url(#${ids}-orb)`} className="cz-crew-shell" />
+        <ellipse cx="25.5" cy="24.5" rx="6" ry="3.2" transform="rotate(-28 25.5 24.5)" className="cz-crew-spec" />
+        <rect x="19.5" y="29" width="25" height="11" rx="5.5" fill={`url(#${ids}-glass)`} />
+        <path d="M22.5 31.4 Q25 30.2 28 30.2" className="cz-crew-gloss" />
+        <rect x="24.6" y="32.2" width="4.6" height="4.6" rx="2.3" className="cz-crew-eye" />
+        <rect x="34.8" y="32.2" width="4.6" height="4.6" rx="2.3" className="cz-crew-eye" />
+        <path d={ORB_HALO_FRONT} transform="rotate(-14 32 39)" className="cz-crew-halo" stroke={`url(#${ids}-halo)`} />
+        <circle cx="11" cy="53" r="4.6" fill={`url(#${ids}-orb)`} className="cz-crew-shell" />
+        <circle cx="53" cy="53" r="4.6" fill={`url(#${ids}-orb)`} className="cz-crew-shell" />
       </g>
     </g>
   );
@@ -103,7 +110,7 @@ export default function ColleagueZeroCrew() {
   // The document floats just in front of whoever has it.
   const st = STATIONS[at];
   const top = iso(st.x + 0.75, st.y + 0.75, 18 + (st.kind === "bot" ? 14 : 6));
-  const doc = { X: top.X + (st.kind === "bot" ? 32 : 0), Y: top.Y - (st.kind === "bot" ? 40 : 26) };
+  const doc = { X: top.X + (st.kind === "bot" ? 52 : 0), Y: top.Y - (st.kind === "bot" ? 30 : 26) };
   // Snap back to the inbox without gliding across the scene.
   const resetting = beat === 0;
 

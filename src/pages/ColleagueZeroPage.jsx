@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Icon from "../components/Icon";
-import ColleagueZeroCrew, { Bot, CrewDefs } from "../components/ColleagueZeroCrew";
+import { Bot, CrewDefs, ORB_HALO_BACK, ORB_HALO_FRONT } from "../components/ColleagueZeroCrew";
+import ColleagueZeroBadge from "../components/ColleagueZeroBadge";
 import { getLeadSource, hackathonConfigured, sendHackathonRegistrationToSheet } from "../sheets";
 import "./ColleagueZero.css";
 
@@ -216,13 +217,6 @@ function Ticker() {
 // Words wrapped in *asterisks* are set in maroon.
 const MANIFESTO = "Not a chatbot. Not an automation. A *colleague.*";
 
-const STATS = [
-  { n: "24", k: "Hours", cap: "Starts 11:00 Friday, ends 11:00 Saturday" },
-  { n: "2", k: "Days", cap: "Day one is fully virtual. Day two is in person" },
-  { n: "5", k: "Max team", cap: "A maximum of five people" },
-  { n: "2+", k: "Agents", cap: "More than one agent, each with a clear role" },
-];
-
 function Manifesto() {
   const ref = useRef(null);
   useScrollProgress(ref);
@@ -250,77 +244,33 @@ function Manifesto() {
           autonomous digital employee for education: agents that reason, correct their own
           mistakes, and carry a complex job from start to finish.
         </p>
-        <dl className="cz-stats">
-          {STATS.map((x) => (
-            <div key={x.k}><dt>{x.k}</dt><dd>{x.n}</dd><p className="cz-stats-cap">{x.cap}</p></div>
-          ))}
-        </dl>
       </div>
     </section>
   );
 }
 
-/* The challenge: what this hackathon is not, then what it is, drawn with
-   the hero's robots. Each little scene moves the way that kind of system
-   behaves; the wording is the brief's. */
-function ChallengeScene({ kind }) {
-  const ids = `czx-${kind}`;
-  return (
-    <svg viewBox="0 0 240 170" className={"cz-x-art is-" + kind} aria-hidden="true">
-      <CrewDefs ids={ids} />
-      <ellipse cx="120" cy="158" rx="70" ry="8" className="cz-x-floor" />
-      {kind === "chatbot" && (
-        <>
-          <g className="cz-x-bubble">
-            <rect x="22" y="14" width="70" height="34" rx="17" />
-            <text x="57" y="37">?</text>
-          </g>
-          <g className="cz-x-reply">
-            <rect x="132" y="44" width="74" height="30" rx="15" />
-            <circle cx="155" cy="59" r="3" /><circle cx="169" cy="59" r="3" /><circle cx="183" cy="59" r="3" />
-          </g>
-        </>
-      )}
-      {kind === "automation" && (
-        <>
-          {[40, 102, 164].map((x, i) => (
-            <g key={x} className="cz-x-step">
-              <rect x={x} y="22" width="36" height="36" rx="9" />
-              <text x={x + 18} y="45">{i + 1}</text>
-            </g>
-          ))}
-          <path d="M76 40h26M138 40h26" className="cz-x-link" />
-          <path d="M200 50 C 214 80, 26 80, 40 50" className="cz-x-loop" />
-          <circle r="5" className="cz-x-run">
-            <animateMotion dur="3s" repeatCount="indefinite" path="M58 40 H182 C 214 80, 26 80, 58 40" />
-          </circle>
-        </>
-      )}
-      {kind === "colleague" && (
-        <>
-          <circle cx="120" cy="46" r="34" className="cz-x-ring" />
-          {[0, 90, 180, 270].map((a) => {
-            const r = ((a - 90) * Math.PI) / 180;
-            return <circle key={a} cx={120 + 34 * Math.cos(r)} cy={46 + 34 * Math.sin(r)} r="5" className="cz-x-node" />;
-          })}
-          <circle r="6" className="cz-x-orb">
-            <animateMotion dur="4s" repeatCount="indefinite" path="M120 12 A34 34 0 1 1 119.99 12" />
-          </circle>
-          <path d="m110 47 7 7 13-14" className="cz-x-check" />
-        </>
-      )}
-      <Bot X={120} Y={160} on={kind === "colleague"} ids={ids} />
-    </svg>
-  );
-}
-
+/* The challenge, as three words. The two it isn't are struck through and
+   the one it is gets underlined, drawn once as the section comes into view. */
 const CHALLENGE = [
-  { kind: "chatbot", t: "A chatbot", v: "Waits for a question and answers it.", ok: false },
-  { kind: "automation", t: "A basic automation", v: "Follows a fixed script.", ok: false },
-  { kind: "colleague", t: "A digital colleague", v: "Plans the work, uses tools, checks its own output and fixes what is wrong.", ok: true },
+  { w: "Chatbot", v: "Waits for a question and answers it.", ok: false },
+  { w: "Automation", v: "Follows a fixed script.", ok: false },
+  { w: "Colleague", v: "Plans the work, uses tools, checks its own output and fixes what is wrong.", ok: true },
 ];
 
 function Challenge() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (prefersReducedMotion() || !("IntersectionObserver" in window)) { el.classList.add("is-in"); return; }
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      el.classList.add("is-in");
+      io.disconnect();
+    }, { threshold: 0.4 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   return (
     <section className="cz-section cz-section--tight" id="the-main">
       <div className="cz-wrap">
@@ -334,17 +284,14 @@ function Challenge() {
             <p className="cz-note cz-mono">Every project must solve a real problem in EdTech</p>
           </div>
         </div>
-        <ul className="cz-x">
-          {CHALLENGE.map((x) => (
-            <li key={x.kind} className={x.ok ? "is-ok" : ""}>
-              <ChallengeScene kind={x.kind} />
-              <div className="cz-x-text">
-                <span className={"cz-x-mark" + (x.ok ? " is-ok" : "")} aria-hidden="true">{x.ok ? "✓" : "✕"}</span>
-                <div>
-                  <h3>{x.t}</h3>
-                  <p>{x.v}</p>
-                </div>
-              </div>
+        <ul className="cz-words" ref={ref}>
+          {CHALLENGE.map((x, i) => (
+            <li key={x.w} className={x.ok ? "is-ok" : ""} style={{ "--i": i }}>
+              <span className="cz-words-w">
+                {x.w}
+                <i aria-hidden="true" />
+              </span>
+              <p>{x.v}</p>
             </li>
           ))}
         </ul>
@@ -438,7 +385,7 @@ function Ideas() {
   const hold = (n) => { if (n < ROTATING.length) { setI(n); setHeld(true); } };
   const release = () => setHeld(false);
   return (
-    <section className="cz-section cz-twist" id="ideas">
+    <section className="cz-section cz-twist is-dark" id="ideas">
       <div className="cz-wrap">
         <Eyebrow n="04">Ideas to get you started</Eyebrow>
         <h2 className="cz-twist-line">
@@ -837,36 +784,147 @@ function FlowDemo() {
   );
 }
 
+/* The show: one premium object instead of a diagram. A stage screen,
+   angled and floating under a spotlight, with the android centre stage
+   inside a ring of four steps; a light travels the ring and each step
+   lights as it passes. An admission ticket for the presentations is
+   pinned over its corner. Both tilt towards the pointer. */
+const SHOW_STEPS = ["Plan", "Tools", "Check", "Done"];
+const SHOW_LOOP = 6;
+
 function TheShow() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || prefersReducedMotion()) return;
+    let raf = 0, tx = 0, ty = 0, x = 0, y = 0, live = false;
+    const tick = () => {
+      x += (tx - x) * 0.08; y += (ty - y) * 0.08;
+      el.style.setProperty("--px", x.toFixed(3));
+      el.style.setProperty("--py", y.toFixed(3));
+      raf = !live && Math.abs(tx - x) + Math.abs(ty - y) < 0.002 ? 0 : requestAnimationFrame(tick);
+    };
+    const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    const onMove = (e) => {
+      const r = el.getBoundingClientRect();
+      tx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (r.width / 2)));
+      ty = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (r.height / 2)));
+      live = true; kick();
+    };
+    const onLeave = () => { tx = 0; ty = 0; live = false; kick(); };
+    el.addEventListener("pointermove", onMove, { passive: true });
+    el.addEventListener("pointerleave", onLeave);
+    return () => { cancelAnimationFrame(raf); el.removeEventListener("pointermove", onMove); el.removeEventListener("pointerleave", onLeave); };
+  }, []);
+
+  // The ring: four steps, starting top left and running clockwise.
+  const C = { x: 320, y: 196 }, R = 128;
+  const at = (i) => {
+    const a = ((-135 + i * 90) * Math.PI) / 180;
+    return { x: C.x + R * Math.cos(a), y: C.y + R * Math.sin(a) };
+  };
+  // Two half-circles: a single arc back to its own start is ambiguous and
+  // can be drawn around the wrong centre.
+  const p0 = at(0), p2 = at(2);
+  const ring = `M ${p0.x} ${p0.y} A ${R} ${R} 0 0 1 ${p2.x} ${p2.y} A ${R} ${R} 0 0 1 ${p0.x} ${p0.y}`;
+
   return (
-    <section className="cz-section cz-broadcast">
+    <section className="cz-section cz-broadcast cz-show">
       <div className="cz-wrap">
-        <div className="cz-measured-head">
-          <div>
-            <Eyebrow n="06">The show</Eyebrow>
-            <h2 className="cz-h2">Then show it working, live.</h2>
-          </div>
-          <p className="cz-lede">
-            At 12:00 on Saturday, every team presents at the Melsoft offices with a live
-            demonstration of its digital colleague completing its workflow. The room watches it run.
-          </p>
+        <div className="cz-show-head">
+          <Eyebrow n="06">The show</Eyebrow>
+          <h2 className="cz-h2">Then show it working, live.</h2>
         </div>
 
-        <figure className="cz-screen">
-          <span className="cz-screen-c tl" /><span className="cz-screen-c tr" />
-          <span className="cz-screen-c bl" /><span className="cz-screen-c br" />
-          <div className="cz-screen-top cz-mono">
-            <span><i className="cz-live-dot" aria-hidden="true" /> Live · demo</span>
-            <span>Example · a marking colleague</span>
+        <div className="cz-stage" ref={ref} role="img" aria-label="Presentations on Saturday 14 November at 12:00 at the Melsoft offices: a live demonstration of your digital colleague completing its workflow.">
+          <span className="cz-stage-beam" aria-hidden="true" />
+          <div className="cz-stage-float" aria-hidden="true">
+            <div className="cz-stage-screen">
+              <span className="cz-stage-live"><i className="cz-live-dot" /> Live</span>
+              <svg viewBox="0 0 640 400" className="cz-stage-svg">
+                <CrewDefs ids="czs" />
+                <circle cx={C.x} cy={C.y} r={R} className="cz-stage-ring" />
+                <path d={ring} className="cz-stage-trail" pathLength="1" style={{ "--loop": `${SHOW_LOOP}s` }} />
+                <circle r="7" className="cz-stage-orb">
+                  <animateMotion dur={`${SHOW_LOOP}s`} repeatCount="indefinite" path={ring} />
+                </circle>
+                {SHOW_STEPS.map((t, i) => {
+                  const p = at(i);
+                  const right = p.x > C.x;
+                  return (
+                    <g key={t} className={"cz-stage-step" + (i === 3 ? " is-done" : "")} style={{ "--d": `${(i * SHOW_LOOP) / 4}s`, "--loop": `${SHOW_LOOP}s` }}>
+                      <circle cx={p.x} cy={p.y} r="15" className="cz-stage-node" />
+                      {i === 3 && <path d={`M${p.x - 6} ${p.y} l4 4 8-9`} className="cz-stage-tick" />}
+                      <text x={p.x + (right ? 26 : -26)} y={p.y + 5} textAnchor={right ? "start" : "end"} className="cz-stage-t">{t}</text>
+                    </g>
+                  );
+                })}
+                <g transform="translate(320 263) scale(2.3) translate(-32 -63)">
+                  <Bot X={32} Y={77} on ids="czs" />
+                </g>
+              </svg>
+            </div>
+            {/* The admission ticket, pinned over the corner. */}
+            <div className="cz-ticket">
+              <div className="cz-ticket-main">
+                <span className="cz-ticket-k">Presentations</span>
+                <strong>Sat 14 Nov · 12:00</strong>
+                <span className="cz-ticket-where">Melsoft offices</span>
+              </div>
+              <div className="cz-ticket-stub"><i /></div>
+            </div>
           </div>
-          <FlowDemo />
-        </figure>
+        </div>
+      </div>
+    </section>
+  );
+}
 
-        <ul className="cz-cams">
-          <li><b>Every agent has a role.</b> Each one hands its work to the next.</li>
-          <li><b>Mistakes get caught.</b> Work that comes back has been checked and is being fixed.</li>
-          <li><b>It finishes the job.</b> A result delivered, not a suggestion.</li>
-        </ul>
+/* 07 · Teams: a roster card set at a fixed 3D angle, with a slab edge
+   for thickness and the seats standing off its face. Static: the only
+   motion is the Solo / Team switch folding the roster to one seat. */
+const TEAM_SEATS = [
+  { tag: "DEV", tone: "navy" },
+  { tag: "DEV", tone: "slate" },
+  { tag: "UX", tone: "maroon" },
+  { tag: "EDU", tone: "pale" },
+  { tag: "+1", tone: "open" },
+];
+
+function Teams() {
+  const [solo, setSolo] = useState(false);
+  return (
+    <section className="cz-section cz-teams" id="teams">
+      <div className="cz-wrap cz-teams-grid">
+        <div>
+          <Eyebrow n="07">Teams</Eyebrow>
+          <h2 className="cz-h2">Build solo, or with up to five people.</h2>
+          <p className="cz-lede">Like your agents, the best teams mix roles.</p>
+        </div>
+
+        <div className={"cz-roster" + (solo ? " is-solo" : "")}>
+          <div className="cz-roster-card">
+            <div className="cz-roster-top">
+              <span className="cz-roster-k"><Icon name="users" size={16} /> {solo ? "Solo" : "Team"}</span>
+              <div className="cz-roster-switch" role="group" aria-label="Show a solo entry or a team">
+                <button type="button" className={solo ? "is-on" : ""} aria-pressed={solo} onClick={() => setSolo(true)}>Solo</button>
+                <button type="button" className={!solo ? "is-on" : ""} aria-pressed={!solo} onClick={() => setSolo(false)}>Team</button>
+              </div>
+            </div>
+            <div className="cz-roster-seats">
+              <span className="cz-roster-link" aria-hidden="true" />
+              <ul aria-label="A team: two developers, a UX designer, an education specialist and one more">
+                {TEAM_SEATS.map((m, i) => (
+                  <li key={i} className={"is-" + m.tone} style={{ "--i": i }}>
+                    <span className="cz-roster-av">{m.tag}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <p className="cz-roster-foot">Solo or up to 5 per team</p>
+          </div>
+          <span className="cz-roster-shadow" aria-hidden="true" />
+        </div>
       </div>
     </section>
   );
@@ -883,7 +941,7 @@ function WhatToPresent() {
   return (
     <section className="cz-section">
       <div className="cz-wrap">
-        <Eyebrow n="07">What to present</Eyebrow>
+        <Eyebrow n="08">What to present</Eyebrow>
         <h2 className="cz-h2 cz-rules-head">Four things to show the room.</h2>
         <ol className="cz-rules">
           {PRESENT.map((r, i) => (
@@ -955,7 +1013,7 @@ function Faq() {
     <section className="cz-section" id="faq">
       <div className="cz-wrap cz-split">
         <div className="cz-split-aside">
-          <Eyebrow n="09">FAQ</Eyebrow>
+          <Eyebrow n="10">FAQ</Eyebrow>
           <h2 className="cz-h2">Questions, answered.</h2>
         </div>
         <div className="cz-faq">
@@ -1296,33 +1354,33 @@ function RegisterForm({ navigate }) {
   );
 }
 
+const GLANCE = [
+  ["Role", "Digital colleague for education"],
+  ["Team", "Up to five people"],
+  ["Day one", "Online · Fri 13 Nov, 11:00"],
+  ["Day two", "Melsoft offices · Sat 14 Nov, 09:00"],
+  ["Presentations", "Sat 14 Nov, 12:00"],
+  ["Entry", "Free"],
+];
+
 function Register({ navigate }) {
   return (
     <section className="cz-section" id="register">
-      <div className="cz-wrap cz-register">
-        <div className="cz-vacancy">
-          <Eyebrow n="08">Now hiring · 1 position</Eyebrow>
-          <h2 className="cz-vacancy-title">Colleague Zero.</h2>
-          <p className="cz-lede cz-vacancy-lede">
-            <b>The role:</b> a digital colleague for education. <b>The interview:</b> 24 hours. Put
-            your team forward and build the colleague nobody has hired yet.
-          </p>
-          {/* Read as a job posting: the spec, then the itinerary, then the
-              entry stamped like the page's other stamps. */}
-          <dl className="cz-spec">
-            <div><dt>Role</dt><dd>Digital colleague for education</dd></div>
-            <div><dt>Team</dt><dd>Up to five people</dd></div>
-          </dl>
-          <dl className="cz-itin">
-            <div><dt>Day one</dt><dd>Online · Fri 13 Nov, 11:00</dd></div>
-            <div><dt>Day two</dt><dd>Melsoft offices · Sat 14 Nov, 09:00</dd></div>
-            <div><dt>Presentations</dt><dd>Sat 14 Nov, 12:00</dd></div>
-          </dl>
-          <dl className="cz-entry">
-            <dt>Entry</dt><dd>Free</dd>
-          </dl>
+      <div className="cz-wrap">
+        <div className="cz-register">
+          <div className="cz-vacancy">
+            <Eyebrow n="09">Now hiring · 1 position</Eyebrow>
+            {/* The position's staff badge: name, role and dates at a glance. */}
+            <ColleagueZeroBadge />
+          </div>
+          <RegisterForm navigate={navigate} />
         </div>
-        <RegisterForm navigate={navigate} />
+        {/* The details, as one strip under both columns. */}
+        <dl className="cz-glance">
+          {GLANCE.map(([k, v]) => (
+            <div key={k} className={k === "Entry" ? "is-entry" : undefined}><dt>{k}</dt><dd>{v}</dd></div>
+          ))}
+        </dl>
       </div>
     </section>
   );
@@ -1402,10 +1460,20 @@ function AgentBuddy() {
       later(() => el.classList.remove("is-blink"), 140);
       later(blink, 2600 + Math.random() * 3600);
     };
-    const idleWave = () => { wave(); later(idleWave, 11000 + Math.random() * 6000); };
+    const wink = () => {
+      if (el.classList.contains("is-waving")) return;
+      el.classList.add("is-wink");
+      later(() => el.classList.remove("is-wink"), 650);
+    };
+    // Idle: a wink, then a wave, alternating every few seconds.
+    let next = 0;
+    const idle = () => {
+      (next++ % 2 === 0 ? wink : wave)();
+      later(idle, 3000 + Math.random() * 2000);
+    };
     later(wave, 900);
     later(blink, 2200);
-    later(idleWave, 9000);
+    later(idle, 3600);
 
     let raf = 0, px = 0, py = 0;
     const look = () => {
@@ -1431,54 +1499,36 @@ function AgentBuddy() {
   }, []);
   return (
     <span className="cz-buddy" ref={ref} aria-hidden="true">
-      <svg viewBox="0 0 64 70">
-        <defs>
-          {/* Soft top lighting on every surface, all within the navy family. */}
-          <linearGradient id="czb-head" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#2a3c6e" />
-            <stop offset="1" stopColor="#0a1733" />
-          </linearGradient>
-          <linearGradient id="czb-visor" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#24366a" />
-            <stop offset="1" stopColor="#0c1838" />
-          </linearGradient>
-          <linearGradient id="czb-body" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#33467c" />
-            <stop offset="1" stopColor="#1c2b55" />
-          </linearGradient>
-        </defs>
-        <ellipse className="cz-buddy-shadow" cx="32" cy="66" rx="12" ry="2" />
+      <svg viewBox="0 0 64 80">
+        <CrewDefs ids="czb" />
+        <ellipse className="cz-buddy-shadow" cx="32" cy="75" rx="13" ry="2.4" />
         <g className="cz-buddy-bob">
-          {/* Left arm, resting by the side. */}
-          <g className="cz-buddy-arm-l">
-            <rect x="15.5" y="38" width="4.5" height="15" rx="2.25" />
-            <circle className="cz-buddy-hand" cx="17.75" cy="54" r="2.6" />
-          </g>
-          {/* Torso: tapered, with a seam and a softly glowing core. */}
-          <rect className="cz-buddy-neck" x="29" y="32.5" width="6" height="4" rx="1.5" />
-          <path className="cz-buddy-body" d="M20 40 Q20 36 24 36 H40 Q44 36 44 40 L42.4 56 Q42 60 38 60 H26 Q22 60 21.6 56 Z" />
-          <path className="cz-buddy-seam" d="M24.5 39 H39.5" />
-          <circle className="cz-buddy-core" cx="32" cy="47" r="2.4" />
-          {/* Right arm: hangs down at rest, swings up from the shoulder to wave. */}
-          <g className="cz-buddy-arm-r">
-            <rect x="44" y="24" width="4.5" height="15" rx="2.25" />
-            <circle className="cz-buddy-hand" cx="46.25" cy="23.5" r="2.6" />
-          </g>
+          {/* The halo's far side, behind the sphere, with a spark running round it. */}
+          <path className="cz-buddy-halo is-back" d={ORB_HALO_BACK} transform="rotate(-14 32 39)" stroke="url(#czb-halo)" />
           <g className="cz-buddy-head">
-            <line className="cz-buddy-antenna" x1="32" y1="6.5" x2="32" y2="12.5" />
-            <circle className="cz-buddy-bulb" cx="32" cy="5" r="2.6" />
-            <rect className="cz-buddy-ear" x="16.5" y="18.5" width="3" height="8" rx="1.5" />
-            <rect className="cz-buddy-ear" x="44.5" y="18.5" width="3" height="8" rx="1.5" />
-            <rect className="cz-buddy-skull" x="19" y="12" width="26" height="21" rx="9" />
-            <path className="cz-buddy-rim" d="M24 13.4 H40" />
-            <rect className="cz-buddy-visor" x="21.8" y="16" width="20.4" height="12.5" rx="5.6" />
-            <path className="cz-buddy-gloss" d="M24.2 18.4 Q26 17.1 29 17.1" />
+            <circle className="cz-buddy-skull" cx="32" cy="34" r="18" fill="url(#czb-orb)" />
+            <ellipse className="cz-buddy-spec" cx="25.5" cy="24.5" rx="6" ry="3.2" transform="rotate(-28 25.5 24.5)" />
+            <rect className="cz-buddy-visor" x="19.5" y="29" width="25" height="11" rx="5.5" fill="url(#czb-glass)" />
+            <path className="cz-buddy-gloss" d="M22.5 31.4 Q25 30.2 28 30.2" />
             <g className="cz-buddy-eyes">
-              <rect className="cz-buddy-eye" x="26" y="19.6" width="3.2" height="5" rx="1.6" />
-              <rect className="cz-buddy-eye" x="34.8" y="19.6" width="3.2" height="5" rx="1.6" />
-              <path className="cz-buddy-happy" d="M25.7 23.4 Q27.6 20.6 29.5 23.4 M34.5 23.4 Q36.4 20.6 38.3 23.4" />
+              <rect className="cz-buddy-eye" x="24.6" y="32.2" width="4.6" height="4.6" rx="2.3" />
+              <rect className="cz-buddy-eye is-right" x="34.8" y="32.2" width="4.6" height="4.6" rx="2.3" />
+              <path className="cz-buddy-wink" d="M34.6 34.8 Q37.1 32.6 39.6 34.8" />
+              <path className="cz-buddy-happy" d="M24.4 35 Q26.9 32.4 29.4 35 M34.6 35 Q37.1 32.4 39.6 35" />
             </g>
-            <path className="cz-buddy-smile" d="M30.2 26.2 Q32 27.5 33.8 26.2" />
+            <path className="cz-buddy-smile" d="M29.6 38.2 Q32 39.6 34.4 38.2" />
+          </g>
+          {/* The halo's near side, in front of the sphere. */}
+          <path className="cz-buddy-halo" d={ORB_HALO_FRONT} transform="rotate(-14 32 39)" stroke="url(#czb-halo)" />
+          <circle className="cz-buddy-spark" r="1.4">
+            <animateMotion dur="5s" repeatCount="indefinite" rotate="auto" path="M5 39 A27 7 0 0 0 59 39 A27 7 0 0 0 5 39" />
+          </circle>
+          {/* Floating hands. The right one swings out and up to wave. */}
+          <g className="cz-buddy-arm-l">
+            <circle className="cz-buddy-hand" cx="11" cy="53" r="4.6" fill="url(#czb-orb)" />
+          </g>
+          <g className="cz-buddy-arm-r">
+            <circle className="cz-buddy-hand" cx="53" cy="53" r="4.6" fill="url(#czb-orb)" />
           </g>
         </g>
       </svg>
@@ -1539,6 +1589,61 @@ function CountdownThought({ onRegister }) {
   );
 }
 
+/* ── Hero video ────────────────────────────────────────────────────────
+   Plays muted and loops (browsers only autoplay muted video), inline on
+   phones. A small button turns the sound on. It pauses while off screen,
+   and with reduced motion it waits for a press instead of autoplaying. */
+const HERO_VIDEO = "/hackerthon%20video.mp4";
+
+function HeroVideo() {
+  const ref = useRef(null);
+  const [muted, setMuted] = useState(true);
+  const [reduced] = useState(prefersReducedMotion);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v || reduced) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) v.play().catch(() => {});
+      else v.pause();
+    }, { threshold: 0.2 });
+    io.observe(v);
+    return () => io.disconnect();
+  }, [reduced]);
+  const toggleSound = () => {
+    const v = ref.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setMuted(v.muted);
+    if (!v.muted) v.play().catch(() => {});
+  };
+  return (
+    <div className="cz-hvid">
+      <div className="cz-hvid-frame">
+        <video
+          ref={ref}
+          src={HERO_VIDEO}
+          poster="/assets/hackathon-video-poster.jpg"
+          muted
+          loop
+          playsInline
+          autoPlay={!reduced}
+          controls={reduced}
+          preload="auto"
+          aria-label="Colleague Zero hackathon video"
+        />
+        {!reduced && (
+          <button type="button" className="cz-hvid-sound" onClick={toggleSound} aria-label={muted ? "Turn sound on" : "Turn sound off"} aria-pressed={!muted}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" />
+              {muted ? <path d="m16 9.5 5 5m0-5-5 5" className="s" /> : <path d="M16 9a4.5 4.5 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11" className="s" />}
+            </svg>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ── Page ────────────────────────────────────────────────────────────── */
 
 const ColleagueZeroPage = ({ navigate }) => {
@@ -1578,7 +1683,7 @@ const ColleagueZeroPage = ({ navigate }) => {
             </dl>
           </div>
           <div className="cz-hero-stage">
-            <ColleagueZeroCrew />
+            <HeroVideo />
           </div>
         </div>
       </section>
@@ -1591,6 +1696,7 @@ const ColleagueZeroPage = ({ navigate }) => {
       <Ideas />
       <Schedule />
       <TheShow />
+      <Teams />
       <WhatToPresent />
       <Register navigate={navigate} />
       <Faq />
